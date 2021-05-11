@@ -1,0 +1,17 @@
+{
+    "name": "biiiiiigmonster/cleanable",
+    "description": "Laravel framework eloquent trait",
+    "type": "library",
+    "keywords": ["laravel", "orm", "trait"],
+    "require": {
+        "php": "^8.0",
+        "laravel/framework": "^8.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "YunFeng Lu",
+            "email": "603707288@qq.com"
+        }
+    ]
+}
