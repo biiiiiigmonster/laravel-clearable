@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Concerns;
+namespace Biiiiiigmonster\Cleanable;
 
 
 use Closure;
