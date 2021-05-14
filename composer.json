@@ -1,5 +1,5 @@
 {
-    "name": "biiiiiigmonster/cleanable",
+    "name": "biiiiiigmonster/laravel-cleanable",
     "description": "Laravel framework eloquent trait",
     "type": "library",
     "keywords": ["laravel", "orm", "trait"],
