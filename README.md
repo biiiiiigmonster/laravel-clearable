@@ -24,7 +24,7 @@ English | [中文](./README-CN.md)
 # Installation
 
 ```bash
-composer require biiiiiigmonster/cleanable
+composer require biiiiiigmonster/laravel-cleanable
 ```
 
 # License
