@@ -16,7 +16,12 @@ trait Cleanable
      */
     protected array $cleanable = [];
 
-
+    /**
+     * Determine if pass soft deleted on to cleanable.
+     *
+     * @var bool
+     */
+    protected bool $passSoftDeletedOn = true;
 
     /**
      * Auto register cleanable.
@@ -77,5 +82,25 @@ trait Cleanable
         $condition = $condition instanceof Closure ? $condition($this) : $condition;
 
         return value($condition) ? $this->makeCleanable($cleanables) : $this;
+    }
+
+    /**
+     * Get passSoftDeletedOn.
+     *
+     * @return bool
+     */
+    public function isPassSoftDeletedOn(): bool
+    {
+        return $this->passSoftDeletedOn;
+    }
+
+    /**
+     * Set the passSoftDeletedOn attributes for the model.
+     *
+     * @param bool $passSoftDeletedOn
+     */
+    public function setPassSoftDeletedOn(bool $passSoftDeletedOn): void
+    {
+        $this->passSoftDeletedOn = $passSoftDeletedOn;
     }
 }
