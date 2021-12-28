@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Biiiiiigmonster\Cleanable;
+namespace Biiiiiigmonster\Cleanable\Concerns;
 
 
-use Closure;
+use Biiiiiigmonster\Cleanable\Cleanabler;
 use Illuminate\Database\Eloquent\Model;
 
 trait Cleanable
@@ -17,11 +17,11 @@ trait Cleanable
     protected array $cleanable = [];
 
     /**
-     * Determine if pass soft deleted on to cleanable.
+     * Determine if propagate soft delete to cleanable.
      *
      * @var bool
      */
-    protected bool $passSoftDeletedOn = true;
+    protected bool $propagateSoftDelete = true;
 
     /**
      * Auto register cleanable.
@@ -73,34 +73,32 @@ trait Cleanable
     /**
      * Make the given, typically visible, attributes cleanable if the given truth test passes.
      *
-     * @param bool|Closure $condition
+     * @param mixed $condition
      * @param array|string|null $cleanables
      * @return $this
      */
-    public function makeCleanableIf(bool|Closure $condition, array|string|null $cleanables): static
+    public function makeCleanableIf(mixed $condition, array|string|null $cleanables): static
     {
-        $condition = $condition instanceof Closure ? $condition($this) : $condition;
-
-        return value($condition) ? $this->makeCleanable($cleanables) : $this;
+        return value($condition, $this) ? $this->makeCleanable($cleanables) : $this;
     }
 
     /**
-     * Get passSoftDeletedOn.
+     * Get propagateSoftDelete.
      *
      * @return bool
      */
-    public function isPassSoftDeletedOn(): bool
+    public function isPropagateSoftDelete(): bool
     {
-        return $this->passSoftDeletedOn;
+        return $this->propagateSoftDelete;
     }
 
     /**
-     * Set the passSoftDeletedOn attributes for the model.
+     * Set the propagateSoftDelete attributes for the model.
      *
-     * @param bool $passSoftDeletedOn
+     * @param bool $propagateSoftDelete
      */
-    public function setPassSoftDeletedOn(bool $passSoftDeletedOn): void
+    public function setPropagateSoftDelete(bool $propagateSoftDelete): void
     {
-        $this->passSoftDeletedOn = $passSoftDeletedOn;
+        $this->propagateSoftDelete = $propagateSoftDelete;
     }
 }

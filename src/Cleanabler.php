@@ -4,7 +4,6 @@
 namespace Biiiiiigmonster\Cleanable;
 
 
-use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
+use NotAllowedCleanableException;
 use ReflectionClass;
 
 class Cleanabler
@@ -72,10 +72,11 @@ class Cleanabler
      * Clean the relation model.
      *
      * @param string $relationName
-     * @param Closure|null $condition
+     * @param mixed $condition
      * @param bool $isForce
+     * @throws NotAllowedCleanableException
      */
-    protected function clean(string $relationName, ?Closure $condition = null, bool $isForce = false): void
+    protected function clean(string $relationName, mixed $condition = null, bool $isForce = false): void
     {
         /** @var Relation $relation */
         $relation = $this->model->$relationName();
@@ -83,9 +84,8 @@ class Cleanabler
         // Filter the model's relation value to be clean up.
         $willClean = fn(string $relationName): Collection => collect($this->model->getRelationValue($relationName))
             ->filter(
-                fn(Model $relationModel) => $condition instanceof Closure
-                    ? $condition($this->model, $relationModel)
-                    : ($isForce || !$this->isSoftDeleteModel() || $this->model->isPassSoftDeletedOn())
+                fn(Model $relationModel) => value($condition, $this->model, $relationModel)
+                    ?: ($isForce || $this->model->isPropagateSoftDelete() || !$this->isSoftDeleteModel())
             );
 
         // Clean up according to relation.
@@ -97,6 +97,9 @@ class Cleanabler
             BelongsToMany::class, MorphToMany::class => $relation->detach(
                 $willClean($relationName)->pluck($relation->getRelatedKeyName())
             ),
+            default => throw new NotAllowedCleanableException(
+                sprintf('The cleanable "%s" is relation of "%s", it not allowed to be cleaned.', $relationName, $relation::class)
+            )
         };
     }
 
