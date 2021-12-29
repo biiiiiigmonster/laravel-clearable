@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Collection;
 use NotAllowedCleanableException;
 
 class Cleanabler
@@ -61,45 +60,31 @@ class Cleanabler
         foreach ($cleanable as $relationName => $condition) {
             if (is_numeric($relationName)) {
                 $relationName = $condition;
-                $condition = null;
             }
 
-            $willClean = $this->willClean($relationName, $condition, $isForce);
+            $cleanableModels = collect($this->model->getRelationValue($relationName))
+                ->filter(
+                    static fn(Model $relationModel): bool => $condition instanceof CleanableAttributes
+                        ? $condition->decide($this->model, $relationModel)
+                        : ($isForce || $this->model->isPropagateSoftDelete() || !$this->isSoftDeleteModel())
+                );
 
             $relation = $this->model->$relationName();
             match ($relation::class) {
                 HasOne::class, HasOneThrough::class, MorphOne::class,
-                HasMany::class, HasManyThrough::class, MorphMany::class => $willClean->map(
-                    fn(Model $relationModel) => $isForce
+                HasMany::class, HasManyThrough::class, MorphMany::class => $cleanableModels->map(
+                    static fn(Model $relationModel) => $isForce
                         ? $relationModel->forceDelete()
                         : $relationModel->delete()
                 ),
                 BelongsToMany::class, MorphToMany::class => $relation->detach(
-                    $willClean->pluck($relation->getRelatedKeyName())
+                    $cleanableModels->pluck($relation->getRelatedKeyName())
                 ),
                 default => throw new NotAllowedCleanableException(
                     sprintf('The cleanable "%s" is relation of "%s", it not allowed to be cleaned.', $relationName, $relation::class)
                 )
             };
         }
-    }
-
-    /**
-     * Filter the model's relation value to be clean up.
-     *
-     * @param string $relationName
-     * @param CleanableAttributes|null $condition
-     * @param bool $isForce
-     * @return Collection
-     */
-    protected function willClean(string $relationName, ?CleanableAttributes $condition = null, bool $isForce = false): Collection
-    {
-        return collect($this->model->getRelationValue($relationName))
-            ->filter(
-                fn(Model $relationModel): bool => $condition instanceof CleanableAttributes
-                    ? $condition->decide($this->model, $relationModel)
-                    : ($isForce || $this->model->isPropagateSoftDelete() || !$this->isSoftDeleteModel())
-            );
     }
 
     /**
