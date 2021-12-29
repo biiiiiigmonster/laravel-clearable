@@ -73,7 +73,7 @@ class Cleanabler
             match ($relation::class) {
                 HasOne::class, HasOneThrough::class, MorphOne::class,
                 HasMany::class, HasManyThrough::class, MorphMany::class => $cleanableModels->map(
-                    static fn(Model $relationModel) => $isForce
+                    static fn(Model $relationModel): ?bool => $isForce
                         ? $relationModel->forceDelete()
                         : $relationModel->delete()
                 ),

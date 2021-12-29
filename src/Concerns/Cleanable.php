@@ -28,8 +28,16 @@ trait Cleanable
      */
     protected static function bootCleanable(): void
     {
-        static::deleted(static fn (Model $model) => Cleanabler::make($model)->handle());
-        static::forceDeleted(static fn (Model $model) => Cleanabler::make($model)->handle(true));
+        static::deleted(
+            static function (Model $model): void {
+                Cleanabler::make($model)->handle();
+            }
+        );
+        static::forceDeleted(
+            static function (Model $model): void {
+                Cleanabler::make($model)->handle(true);
+            }
+        );
     }
 
     /**
