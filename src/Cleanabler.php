@@ -5,6 +5,7 @@ namespace Biiiiiigmonster\Cleanable;
 
 
 use Biiiiiigmonster\Cleanable\Contracts\CleanableAttributes;
+use Biiiiiigmonster\Cleanable\Exceptions\NotAllowedCleanableException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use NotAllowedCleanableException;
 
 class Cleanabler
 {
