@@ -4,36 +4,25 @@
 namespace Biiiiiigmonster\Cleanable;
 
 
-use Biiiiiigmonster\Cleanable\Contracts\CleanableAttributes;
+use Biiiiiigmonster\Cleanable\Attributes\Clean;
 use Biiiiiigmonster\Cleanable\Exceptions\NotAllowedCleanableException;
+use Biiiiiigmonster\Cleanable\Jobs\CleanJob;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use ReflectionClass;
+use ReflectionMethod;
 
 class Cleanabler
 {
-    /**
-     * Observe model.
-     *
-     * @var Model
-     */
-    protected Model $model;
-
     /**
      * Cleanabler constructor.
      *
      * @param Model $model
      */
-    public function __construct(Model $model)
+    public function __construct(
+        protected Model $model
+    )
     {
-        $this->model = $model;
     }
 
     /**
@@ -53,47 +42,67 @@ class Cleanabler
      * @param bool $isForce
      * @throws NotAllowedCleanableException
      */
-    public function handle(bool $isForce = false): void
+    public function clean(bool $isForce = false): void
     {
-        $cleanable = $this->model->getCleanable();
+        $model = $this->model->withoutRelations();
+        $cleanable = $this->parse();
 
-        foreach ($cleanable as $relationName => $condition) {
-            if (is_numeric($relationName)) {
-                $relationName = $condition;
+        foreach ($cleanable as $relationName => $configure) {
+            $relation = $model->$relationName();
+            if (!$relation instanceof Relation) {
+                throw new NotAllowedCleanableException(
+                    sprintf('The cleanable "%s" is relation of "%s", it not allowed to be cleaned.', $relationName, $relation::class)
+                );
             }
 
-            $cleanableModels = collect($this->model->getRelationValue($relationName))
-                ->filter(
-                    static fn(Model $relationModel): bool => $condition instanceof CleanableAttributes
-                        ? $condition->decide($this->model, $relationModel)
-                        : ($isForce || $this->model->isPropagateSoftDelete() || !$this->isSoftDeleteModel())
-                );
-
-            $relation = $this->model->$relationName();
-            match ($relation::class) {
-                HasOne::class, HasOneThrough::class, MorphOne::class,
-                HasMany::class, HasManyThrough::class, MorphMany::class => $cleanableModels->map(
-                    static fn(Model $relationModel): ?bool => $isForce
-                        ? $relationModel->forceDelete()
-                        : $relationModel->delete()
-                ),
-                BelongsToMany::class, MorphToMany::class => $relation->detach(
-                    $cleanableModels->pluck($relation->getRelatedKeyName())
-                ),
-                default => throw new NotAllowedCleanableException(
-                    sprintf('The cleanable "%s" is relation of "%s", it not allowed to be cleaned.', $relationName, $relation::class)
-                )
-            };
+            [$condition, $propagateSoftDelete, $cleanQueue] = $configure;
+            $cleanQueue
+                ? CleanJob::dispatch($model, $relationName, $condition, $propagateSoftDelete, $isForce)->onQueue($cleanQueue)
+                : CleanJob::dispatchSync($model, $relationName, $condition, $propagateSoftDelete, $isForce);
         }
     }
 
     /**
-     * Determine if the model use 'SoftDeletes' trait.
+     * Parse cleanable of the model.
      *
-     * @return bool
+     * @return array
      */
-    protected function isSoftDeleteModel(): bool
+    protected function parse(): array
     {
-        return isset(class_uses($this->model)[SoftDeletes::class]);
+        $cleanable = [];
+
+        // from cleanable array
+        foreach ($this->model->getCleanable() as $relationName => $condition) {
+            if (is_numeric($relationName)) {
+                $relationName = $condition;
+                $condition = null;
+            }
+
+            $cleanable[$relationName] = [
+                $condition,
+                $this->model->isPropagateSoftDelete(),
+                $this->model->getCleanQueue()
+            ];
+        }
+
+        // from clean attribute
+        $rfc = new ReflectionClass($this->model);
+        $methods = $rfc->getMethods(ReflectionMethod::IS_PUBLIC);
+        foreach ($methods as $method) {
+            $cleanAttributes = $method->getAttributes(Clean::class);
+            if (empty($cleanAttribute)) {
+                continue;
+            }
+
+            /** @var Clean $instance */
+            $instance = $cleanAttributes[0]->newInstance();
+            $cleanable[$method->getName()] = [
+                $instance->condition,
+                $instance->propagateSoftDelete,
+                $instance->cleanQueue,
+            ];
+        }
+
+        return $cleanable;
     }
 }

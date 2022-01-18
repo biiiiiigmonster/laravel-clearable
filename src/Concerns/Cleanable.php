@@ -25,21 +25,18 @@ trait Cleanable
     protected bool $propagateSoftDelete = true;
 
     /**
+     * @var string|null
+     */
+    protected ?string $cleanQueue = null;
+
+    /**
      * Auto register cleanable.
      * @throws NotAllowedCleanableException
      */
     protected static function bootCleanable(): void
     {
-        static::deleted(
-            static function (Model $model): void {
-                Cleanabler::make($model)->handle();
-            }
-        );
-        static::forceDeleted(
-            static function (Model $model): void {
-                Cleanabler::make($model)->handle(true);
-            }
-        );
+        static::deleted(static fn(Model $model) => Cleanabler::make($model)->clean());
+        static::forceDeleted(static fn(Model $model) => Cleanabler::make($model)->clean(true));
     }
 
     /**
@@ -90,6 +87,22 @@ trait Cleanable
     public function makeCleanableIf(mixed $condition, array|string|null $cleanables): static
     {
         return value($condition, $this) ? $this->makeCleanable($cleanables) : $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCleanQueue(): ?string
+    {
+        return $this->cleanQueue;
+    }
+
+    /**
+     * @param string|null $cleanQueue
+     */
+    public function setCleanQueue(?string $cleanQueue): void
+    {
+        $this->cleanQueue = $cleanQueue;
     }
 
     /**
