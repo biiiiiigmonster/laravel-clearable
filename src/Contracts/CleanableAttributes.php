@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 interface CleanableAttributes
 {
     /**
-     * Decide if the cleanable model will be deleted.
+     * Decide if the cleanable retained.
      *
      * @param Model $cleanable
      * @param Model $model
      * @return bool
      */
-    public function decide(Model $cleanable, Model $model): bool;
+    public function retain(Model $cleanable, Model $model): bool;
 }

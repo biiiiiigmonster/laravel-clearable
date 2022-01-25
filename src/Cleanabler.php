@@ -5,10 +5,10 @@ namespace Biiiiiigmonster\Cleanable;
 
 
 use Biiiiiigmonster\Cleanable\Attributes\Clean;
-use Biiiiiigmonster\Cleanable\Exceptions\NotAllowedCleanableException;
 use Biiiiiigmonster\Cleanable\Jobs\CleanJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -40,25 +40,24 @@ class Cleanabler
      * Cleanable handle.
      *
      * @param bool $isForce
-     * @throws NotAllowedCleanableException
+     * @throws LogicException
      */
     public function clean(bool $isForce = false): void
     {
-        $model = $this->model->withoutRelations();
         $cleanable = $this->parse();
 
         foreach ($cleanable as $relationName => $configure) {
-            $relation = $model->$relationName();
+            $relation = $this->model->$relationName();
             if (!$relation instanceof Relation) {
-                throw new NotAllowedCleanableException(
-                    sprintf('The cleanable "%s" is relation of "%s", it not allowed to be cleaned.', $relationName, $relation::class)
+                throw new LogicException(
+                    sprintf('%s::%s must return a relationship instance.', $this->model::class, $relationName)
                 );
             }
 
-            [$condition, $propagateSoftDelete, $cleanQueue] = $configure;
-            $cleanQueue
-                ? CleanJob::dispatch($model, $relationName, $condition, $propagateSoftDelete, $isForce)->onQueue($cleanQueue)
-                : CleanJob::dispatchSync($model, $relationName, $condition, $propagateSoftDelete, $isForce);
+            $param = [$relationName, $configure->condition, $configure->propagateSoftDelete, $isForce];
+            $configure->cleanQueue
+                ? CleanJob::dispatch($this->model->withoutRelations(), ...$param)->onQueue($configure->cleanQueue)
+                : CleanJob::dispatchSync($this->model, ...$param);
         }
     }
 
@@ -72,17 +71,13 @@ class Cleanabler
         $cleanable = [];
 
         // from cleanable array
-        foreach ($this->model->getCleanable() as $relationName => $condition) {
+        foreach ($this->model->getCleanable() as $relationName => $configure) {
             if (is_numeric($relationName)) {
-                $relationName = $condition;
-                $condition = null;
+                $relationName = $configure;
+                $configure = [];
             }
 
-            $cleanable[$relationName] = [
-                $condition,
-                $this->model->isPropagateSoftDelete(),
-                $this->model->getCleanQueue()
-            ];
+            $cleanable[$relationName] = new Clean(...(array)$configure);
         }
 
         // from clean attribute
@@ -94,13 +89,7 @@ class Cleanabler
                 continue;
             }
 
-            /** @var Clean $instance */
-            $instance = $cleanAttributes[0]->newInstance();
-            $cleanable[$method->getName()] = [
-                $instance->condition,
-                $instance->propagateSoftDelete,
-                $instance->cleanQueue,
-            ];
+            $cleanable[$method->getName()] = $cleanAttributes[0]->newInstance();
         }
 
         return $cleanable;

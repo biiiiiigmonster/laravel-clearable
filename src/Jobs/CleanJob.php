@@ -3,6 +3,7 @@
 namespace Biiiiiigmonster\Cleanable\Jobs;
 
 use Biiiiiigmonster\Cleanable\Contracts\CleanableAttributes;
+use Biiiiiigmonster\Cleanable\Exceptions\NotAllowedCleanableException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -44,14 +45,16 @@ class CleanJob implements ShouldQueue
 
     /**
      * CleanJob handle.
+     *
+     * @throws NotAllowedCleanableException
      */
     public function handle(): void
     {
         $cleanableModels = collect($this->model->getRelationValue($this->relationName))
             ->filter(
                 static fn(Model $relationModel) => $this->condition instanceof CleanableAttributes
-                    ? $this->condition->decide($relationModel, $this->model)
-                    : ($this->isForce || $this->propagateSoftDelete || !$this->isSoftDeleteModel())
+                    ? $this->condition->retain($relationModel, $this->model)
+                    : ($this->isForce || !$this->retainedDuringSoftDelete())
             );
 
         $relation = $this->model->{$this->relationName}();
@@ -64,17 +67,24 @@ class CleanJob implements ShouldQueue
             ),
             BelongsToMany::class, MorphToMany::class => $relation->detach(
                 $cleanableModels->pluck($relation->getRelatedKeyName())
-            )
+            ),
+            default => throw new NotAllowedCleanableException(sprintf(
+                'The cleanable "%s::%s" is relationship of "%s", it not allowed to be cleaned.',
+                $this->model,
+                $this->relationName,
+                $relation::class
+            ))
         };
     }
 
     /**
-     * Determine if the model use 'SoftDeletes' trait.
+     * Determine if the cleanable retained during normal deleting.
      *
      * @return bool
      */
-    protected function isSoftDeleteModel(): bool
+    protected function retainedDuringSoftDelete(): bool
     {
-        return isset(class_uses($this->model)[SoftDeletes::class]);
+        // The static model must have "SoftDeletes" trait and close propagate soft delete.
+        return isset(class_uses($this->model)[SoftDeletes::class]) && !$this->propagateSoftDelete;
     }
 }

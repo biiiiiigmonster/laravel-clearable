@@ -5,7 +5,6 @@ namespace Biiiiiigmonster\Cleanable\Concerns;
 
 
 use Biiiiiigmonster\Cleanable\Cleanabler;
-use Biiiiiigmonster\Cleanable\Exceptions\NotAllowedCleanableException;
 use Illuminate\Database\Eloquent\Model;
 
 trait Cleanable
@@ -25,13 +24,14 @@ trait Cleanable
     protected bool $propagateSoftDelete = true;
 
     /**
+     * Execute clean use the queue.
+     *
      * @var string|null
      */
     protected ?string $cleanQueue = null;
 
     /**
      * Auto register cleanable.
-     * @throws NotAllowedCleanableException
      */
     protected static function bootCleanable(): void
     {
