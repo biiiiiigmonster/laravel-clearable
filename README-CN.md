@@ -1,4 +1,4 @@
-English | [中文](./README-CN.md)
+[English](./README.md) | 中文
 
 <div align="center">
 
@@ -15,22 +15,23 @@ English | [中文](./README-CN.md)
 
 
 
-# Environment
+# 环境
 
-- PHP >= 8
-- laravel >= 8
+- laravel >= 9
 
 
-# Installation
+# 安装
 
 ```bash
 composer require biiiiiigmonster/laravel-cleanable
 ```
 
-# Introductions
-删除作为数据操作的生命周期最后一环，受到关注度较小，然而在业务中完整数据的关联性往往会因为这些疏忽而被破坏。
-这个包可以很方便的帮您管理这些关联数据删除关系，仅仅只需要简单的定义。
-让我们来尝试一下吧！
+# 简介
+“模型关联”是一个非常出色的概念，它可以有效的帮我们维护着数据之间复杂的关系。
+一般来说，“删除”操作作为数据生命周期的最后一节，受到的关注度较小，我们往往在删除数据本身的同时可能会疏忽掉与之关联的模型数据的处理。
+业务中模型完整的关联性也会因为这些残留数据而遭到破坏。
 
-# License
+这个包可以很方便的帮您管理这些关联数据删除关系，仅仅只需要简单的定义。让我们来尝试一下吧！
+
+# 协议
 [MIT](./LICENSE)
