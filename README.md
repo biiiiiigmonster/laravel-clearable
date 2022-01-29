@@ -17,8 +17,7 @@ English | [中文](./README-CN.md)
 
 # Environment
 
-- PHP >= 8
-- laravel >= 8
+- laravel >= 9
 
 
 # Installation
