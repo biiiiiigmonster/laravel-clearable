@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "laravel/framework": "v9.0.0-beta.1"
+        "laravel/framework": "^9.0"
     },
     "autoload": {
         "psr-4": {

@@ -52,8 +52,8 @@ class CleanJob implements ShouldQueue
     {
         $cleanableModels = collect($this->model->getRelationValue($this->relationName))
             ->filter(
-                static fn(Model $relationModel) => $this->condition instanceof CleanableAttributes
-                    ? $this->condition->retain($relationModel, $this->model)
+                static fn(Model $cleanable) => $this->condition instanceof CleanableAttributes
+                    ? !$this->condition->retain($cleanable, $this->model)
                     : ($this->isForce || !$this->retainedDuringSoftDelete())
             );
 
