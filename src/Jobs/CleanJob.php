@@ -2,6 +2,7 @@
 
 namespace Biiiiiigmonster\Cleanable\Jobs;
 
+use Biiiiiigmonster\Cleanable\Cleanabler;
 use Biiiiiigmonster\Cleanable\Contracts\CleanableAttributes;
 use Biiiiiigmonster\Cleanable\Exceptions\NotAllowedCleanableException;
 use Illuminate\Bus\Queueable;
@@ -15,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -54,7 +54,7 @@ class CleanJob implements ShouldQueue
             ->filter(
                 static fn(Model $cleanable) => $this->condition instanceof CleanableAttributes
                     ? !$this->condition->retain($cleanable, $this->model)
-                    : ($this->isForce || !$this->retainedDuringSoftDelete())
+                    : ($this->isForce || !$this->retainedDuringSoftDeletes())
             );
 
         $relation = $this->model->{$this->relationName}();
@@ -82,9 +82,9 @@ class CleanJob implements ShouldQueue
      *
      * @return bool
      */
-    protected function retainedDuringSoftDelete(): bool
+    protected function retainedDuringSoftDeletes(): bool
     {
         // The static model must have "SoftDeletes" trait and close propagate soft delete.
-        return isset(class_uses($this->model)[SoftDeletes::class]) && !$this->propagateSoftDelete;
+        return Cleanabler::hasSoftDeletes($this->model) && !$this->propagateSoftDelete;
     }
 }

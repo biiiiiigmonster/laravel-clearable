@@ -8,6 +8,7 @@ use Biiiiiigmonster\Cleanable\Attributes\Clean;
 use Biiiiiigmonster\Cleanable\Jobs\CleanJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
@@ -93,5 +94,16 @@ class Cleanabler
         }
 
         return $cleanable;
+    }
+
+    /**
+     * Determine if the model has soft delete.
+     *
+     * @param Model|string $model
+     * @return bool
+     */
+    public static function hasSoftDeletes(Model|string $model): bool
+    {
+        return isset(class_uses($model)[SoftDeletes::class]);
     }
 }

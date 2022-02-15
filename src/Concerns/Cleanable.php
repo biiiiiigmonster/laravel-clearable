@@ -36,7 +36,9 @@ trait Cleanable
     protected static function bootCleanable(): void
     {
         static::deleted(static fn(Model $model) => Cleanabler::make($model)->clean());
-        static::forceDeleted(static fn(Model $model) => Cleanabler::make($model)->clean(true));
+        if (Cleanabler::hasSoftDeletes(static::class)) {
+            static::forceDeleted(static fn(Model $model) => Cleanabler::make($model)->clean(true));
+        }
     }
 
     /**

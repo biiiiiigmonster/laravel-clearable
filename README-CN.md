@@ -34,7 +34,23 @@ composer require biiiiiigmonster/laravel-cleanable
 这个包可以很方便的帮您管理这些关联数据删除关系，仅仅只需要简单的定义。让我们来尝试一下吧！
 
 # 使用
+```php
+namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 
+class Post extends Model
+{
+    use Cleanable;
+    
+    protected array $cleanable = ['comments'];
+    
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+}
+```
+定义好这些关联后，
 # 协议
 [MIT](./LICENSE)
