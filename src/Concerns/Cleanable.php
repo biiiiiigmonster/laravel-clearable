@@ -14,21 +14,21 @@ trait Cleanable
      *
      * @var array
      */
-    protected array $cleanable = [];
+    protected $cleanable = [];
 
     /**
      * Determine if propagate soft delete to cleanable.
      *
      * @var bool
      */
-    protected bool $propagateSoftDelete = true;
+    protected $propagateSoftDelete = true;
 
     /**
      * Execute clean use the queue.
      *
      * @var string|null
      */
-    protected ?string $cleanQueue = null;
+    protected $cleanQueue = null;
 
     /**
      * Auto register cleanable.
