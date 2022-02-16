@@ -15,7 +15,14 @@
     },
     "autoload": {
         "psr-4": {
-            "BiiiiiigMonster\\Cleanable\\": "src/"
+            "BiiiiiigMonster\\Cleans\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "BiiiiiigMonster\\Cleans\\CleanServiceProvider"
+            ]
         }
     }
 }

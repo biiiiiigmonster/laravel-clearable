@@ -1,9 +1,9 @@
 <?php
 
-namespace BiiiiiigMonster\Cleanable\Attributes;
+namespace BiiiiiigMonster\Cleans\Attributes;
 
 use Attribute;
-use BiiiiiigMonster\Cleanable\Contracts\CleanableAttributes;
+use BiiiiiigMonster\Cleans\Contracts\CleansAttributes;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class Clean
@@ -11,12 +11,12 @@ class Clean
     /**
      * Clean constructor.
      *
-     * @param CleanableAttributes|null $condition
+     * @param CleansAttributes|null $condition
      * @param bool $cleanWithSoftDelete
      * @param string|null $cleanQueue
      */
     public function __construct(
-        public ?CleanableAttributes $condition = null,
+        public ?CleansAttributes $condition = null,
         public bool $cleanWithSoftDelete = true,
         public ?string $cleanQueue = null
     )

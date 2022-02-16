@@ -1,11 +1,11 @@
 <?php
 
 
-namespace BiiiiiigMonster\Cleanable;
+namespace BiiiiiigMonster\Cleans;
 
 
-use BiiiiiigMonster\Cleanable\Attributes\Clean;
-use BiiiiiigMonster\Cleanable\Jobs\CleanJob;
+use BiiiiiigMonster\Cleans\Attributes\Clean;
+use BiiiiiigMonster\Cleans\Jobs\CleanJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,10 +13,10 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 
-class Cleanabler
+class Cleaner
 {
     /**
-     * Cleanabler constructor.
+     * Cleaner constructor.
      *
      * @param Model $model
      */
@@ -38,16 +38,16 @@ class Cleanabler
     }
 
     /**
-     * Cleanable handle.
+     * Cleaner handle.
      *
      * @param bool $isForce
      * @throws LogicException
      */
-    public function clean(bool $isForce = false): void
+    public function handle(bool $isForce = false): void
     {
-        $cleanable = $this->parse();
+        $cleans = $this->parse();
 
-        foreach ($cleanable as $relationName => $configure) {
+        foreach ($cleans as $relationName => $configure) {
             $relation = $this->model->$relationName();
             if (!$relation instanceof Relation) {
                 throw new LogicException(
@@ -63,22 +63,22 @@ class Cleanabler
     }
 
     /**
-     * Parse cleanable of the model.
+     * Parse cleans of the model.
      *
      * @return array
      */
     protected function parse(): array
     {
-        $cleanable = [];
+        $cleans = [];
 
-        // from cleanable array
-        foreach ($this->model->getCleanable() as $relationName => $configure) {
+        // from cleans array
+        foreach ($this->model->getCleans() as $relationName => $configure) {
             if (is_numeric($relationName)) {
                 $relationName = $configure;
                 $configure = [];
             }
 
-            $cleanable[$relationName] = new Clean(...(array)$configure);
+            $cleans[$relationName] = new Clean(...(array)$configure);
         }
 
         // from clean attribute
@@ -90,10 +90,10 @@ class Cleanabler
                 continue;
             }
 
-            $cleanable[$method->getName()] = $cleanAttributes[0]->newInstance();
+            $cleans[$method->getName()] = $cleanAttributes[0]->newInstance();
         }
 
-        return $cleanable;
+        return $cleans;
     }
 
     /**

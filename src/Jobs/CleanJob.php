@@ -1,10 +1,10 @@
 <?php
 
-namespace BiiiiiigMonster\Cleanable\Jobs;
+namespace BiiiiiigMonster\Cleans\Jobs;
 
-use BiiiiiigMonster\Cleanable\Cleanabler;
-use BiiiiiigMonster\Cleanable\Contracts\CleanableAttributes;
-use BiiiiiigMonster\Cleanable\Exceptions\NotAllowedCleanableException;
+use BiiiiiigMonster\Cleans\Cleaner;
+use BiiiiiigMonster\Cleans\Contracts\CleansAttributes;
+use BiiiiiigMonster\Cleans\Exceptions\NotAllowedCleansException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -29,14 +29,14 @@ class CleanJob implements ShouldQueue
      *
      * @param Model $model
      * @param string $relationName
-     * @param CleanableAttributes|null $condition
+     * @param CleansAttributes|null $condition
      * @param bool $cleanWithSoftDelete
      * @param bool $isForce
      */
     public function __construct(
         protected Model $model,
         protected string $relationName,
-        protected ?CleanableAttributes $condition = null,
+        protected ?CleansAttributes $condition = null,
         protected bool $cleanWithSoftDelete = true,
         protected bool $isForce = false
     )
@@ -46,30 +46,30 @@ class CleanJob implements ShouldQueue
     /**
      * CleanJob handle.
      *
-     * @throws NotAllowedCleanableException
+     * @throws NotAllowedCleansException
      */
     public function handle(): void
     {
-        $cleanableModels = collect($this->model->getRelationValue($this->relationName))
+        $cleanModels = collect($this->model->getRelationValue($this->relationName))
             ->filter(
-                static fn(Model $cleanable) => $this->condition instanceof CleanableAttributes
-                    ? !$this->condition->retain($cleanable, $this->model)
+                static fn(Model $clean) => $this->condition instanceof CleansAttributes
+                    ? !$this->condition->retain($clean, $this->model)
                     : ($this->isForce || !$this->retainedDuringSoftDeletes())
             );
 
         $relation = $this->model->{$this->relationName}();
         match ($relation::class) {
             HasOne::class, HasOneThrough::class, MorphOne::class,
-            HasMany::class, HasManyThrough::class, MorphMany::class => $cleanableModels->map(
+            HasMany::class, HasManyThrough::class, MorphMany::class => $cleanModels->map(
                 static fn(Model $relationModel) => $this->isForce
                     ? $relationModel->forceDelete()
                     : $relationModel->delete()
             ),
             BelongsToMany::class, MorphToMany::class => $relation->detach(
-                $cleanableModels->pluck($relation->getRelatedKeyName())
+                $cleanModels->pluck($relation->getRelatedKeyName())
             ),
-            default => throw new NotAllowedCleanableException(sprintf(
-                'The cleanable "%s::%s" is relationship of "%s", it not allowed to be cleaned.',
+            default => throw new NotAllowedCleansException(sprintf(
+                'The clean "%s::%s" is relationship of "%s", it not allowed to be cleaned.',
                 $this->model,
                 $this->relationName,
                 $relation::class
@@ -78,13 +78,13 @@ class CleanJob implements ShouldQueue
     }
 
     /**
-     * Determine if the cleanable retained during normal deleting.
+     * Determine if the clean model retained during normal deleting.
      *
      * @return bool
      */
     protected function retainedDuringSoftDeletes(): bool
     {
         // The static model must have "SoftDeletes" trait and close propagate soft delete.
-        return Cleanabler::hasSoftDeletes($this->model) && !$this->cleanWithSoftDelete;
+        return Cleaner::hasSoftDeletes($this->model) && !$this->cleanWithSoftDelete;
     }
 }
