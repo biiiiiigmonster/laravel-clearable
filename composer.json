@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Biiiiiigmonster\\Cleanable\\": "src/"
+            "BiiiiiigMonster\\Cleanable\\": "src/"
         }
     }
 }

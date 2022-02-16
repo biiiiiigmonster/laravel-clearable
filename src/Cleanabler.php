@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Biiiiiigmonster\Cleanable;
+namespace BiiiiiigMonster\Cleanable;
 
 
-use Biiiiiigmonster\Cleanable\Attributes\Clean;
-use Biiiiiigmonster\Cleanable\Jobs\CleanJob;
+use BiiiiiigMonster\Cleanable\Attributes\Clean;
+use BiiiiiigMonster\Cleanable\Jobs\CleanJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;

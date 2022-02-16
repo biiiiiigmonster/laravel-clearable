@@ -1,5 +1,5 @@
 <?php
-namespace Biiiiiigmonster\Cleanable\Contracts;
+namespace BiiiiiigMonster\Cleanable\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 

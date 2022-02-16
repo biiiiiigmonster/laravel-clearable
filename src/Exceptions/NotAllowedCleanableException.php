@@ -1,5 +1,5 @@
 <?php
-namespace Biiiiiigmonster\Cleanable\Exceptions;
+namespace BiiiiiigMonster\Cleanable\Exceptions;
 
 use Exception;
 

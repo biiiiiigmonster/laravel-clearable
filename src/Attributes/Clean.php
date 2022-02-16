@@ -1,9 +1,9 @@
 <?php
 
-namespace Biiiiiigmonster\Cleanable\Attributes;
+namespace BiiiiiigMonster\Cleanable\Attributes;
 
 use Attribute;
-use Biiiiiigmonster\Cleanable\Contracts\CleanableAttributes;
+use BiiiiiigMonster\Cleanable\Contracts\CleanableAttributes;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class Clean

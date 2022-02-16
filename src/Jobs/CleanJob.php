@@ -1,10 +1,10 @@
 <?php
 
-namespace Biiiiiigmonster\Cleanable\Jobs;
+namespace BiiiiiigMonster\Cleanable\Jobs;
 
-use Biiiiiigmonster\Cleanable\Cleanabler;
-use Biiiiiigmonster\Cleanable\Contracts\CleanableAttributes;
-use Biiiiiigmonster\Cleanable\Exceptions\NotAllowedCleanableException;
+use BiiiiiigMonster\Cleanable\Cleanabler;
+use BiiiiiigMonster\Cleanable\Contracts\CleanableAttributes;
+use BiiiiiigMonster\Cleanable\Exceptions\NotAllowedCleanableException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;

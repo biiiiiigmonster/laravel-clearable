@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Biiiiiigmonster\Cleanable\Concerns;
+namespace BiiiiiigMonster\Cleanable\Concerns;
 
 
-use Biiiiiigmonster\Cleanable\Cleanabler;
+use BiiiiiigMonster\Cleanable\Cleanabler;
 use Illuminate\Database\Eloquent\Model;
 
 trait Cleanable
