@@ -12,12 +12,12 @@ class Clean
      * Clean constructor.
      *
      * @param CleanableAttributes|null $condition
-     * @param bool $propagateSoftDelete
+     * @param bool $cleanWithSoftDelete
      * @param string|null $cleanQueue
      */
     public function __construct(
         public ?CleanableAttributes $condition = null,
-        public bool $propagateSoftDelete = true,
+        public bool $cleanWithSoftDelete = true,
         public ?string $cleanQueue = null
     )
     {

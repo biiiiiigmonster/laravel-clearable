@@ -7,29 +7,16 @@ namespace BiiiiiigMonster\Cleanable\Concerns;
 use BiiiiiigMonster\Cleanable\Cleanabler;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Trait Cleanable
+ *
+ * @property array $cleanable The relationships that should be deleted when deleted.
+ * @property bool $cleanWithSoftDelete Determine if propagate soft delete to cleanable.
+ * @property string|null $cleanQueue Execute clean use the queue.
+ * @package BiiiiiigMonster\Cleanable\Concerns
+ */
 trait Cleanable
 {
-    /**
-     * The relationships that should be deleted when deleted.
-     *
-     * @var array
-     */
-    protected $cleanable = [];
-
-    /**
-     * Determine if propagate soft delete to cleanable.
-     *
-     * @var bool
-     */
-    protected $propagateSoftDelete = true;
-
-    /**
-     * Execute clean use the queue.
-     *
-     * @var string|null
-     */
-    protected $cleanQueue = null;
-
     /**
      * Auto register cleanable.
      */
@@ -48,7 +35,7 @@ trait Cleanable
      */
     public function getCleanable(): array
     {
-        return $this->cleanable;
+        return $this->cleanable ?? [];
     }
 
     /**
@@ -73,7 +60,7 @@ trait Cleanable
     public function makeCleanable(array|string|null $cleanables): static
     {
         $this->cleanable = array_merge(
-            $this->cleanable, is_array($cleanables) ? $cleanables : func_get_args()
+            $this->getCleanable(), is_array($cleanables) ? $cleanables : func_get_args()
         );
 
         return $this;
@@ -108,22 +95,22 @@ trait Cleanable
     }
 
     /**
-     * Get propagateSoftDelete.
+     * Get cleanWithSoftDelete.
      *
      * @return bool
      */
-    public function isPropagateSoftDelete(): bool
+    public function isCleanWithSoftDelete(): bool
     {
-        return $this->propagateSoftDelete;
+        return $this->cleanWithSoftDelete ?? true;
     }
 
     /**
-     * Set the propagateSoftDelete attributes for the model.
+     * Set the cleanWithSoftDelete attributes for the model.
      *
-     * @param bool $propagateSoftDelete
+     * @param bool $cleanWithSoftDelete
      */
-    public function setPropagateSoftDelete(bool $propagateSoftDelete): void
+    public function setCleanWithSoftDelete(bool $cleanWithSoftDelete): void
     {
-        $this->propagateSoftDelete = $propagateSoftDelete;
+        $this->cleanWithSoftDelete = $cleanWithSoftDelete;
     }
 }

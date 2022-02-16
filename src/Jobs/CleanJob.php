@@ -30,14 +30,14 @@ class CleanJob implements ShouldQueue
      * @param Model $model
      * @param string $relationName
      * @param CleanableAttributes|null $condition
-     * @param bool $propagateSoftDelete
+     * @param bool $cleanWithSoftDelete
      * @param bool $isForce
      */
     public function __construct(
         protected Model $model,
         protected string $relationName,
         protected ?CleanableAttributes $condition = null,
-        protected bool $propagateSoftDelete = true,
+        protected bool $cleanWithSoftDelete = true,
         protected bool $isForce = false
     )
     {
@@ -85,6 +85,6 @@ class CleanJob implements ShouldQueue
     protected function retainedDuringSoftDeletes(): bool
     {
         // The static model must have "SoftDeletes" trait and close propagate soft delete.
-        return Cleanabler::hasSoftDeletes($this->model) && !$this->propagateSoftDelete;
+        return Cleanabler::hasSoftDeletes($this->model) && !$this->cleanWithSoftDelete;
     }
 }
