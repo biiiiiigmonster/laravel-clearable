@@ -55,7 +55,12 @@ class Cleaner
                 );
             }
 
-            $param = [$relationName, $configure->condition, $configure->cleanWithSoftDelete, $isForce];
+            /** @var Clean $configure */
+            $conditionClass = null;
+            if ($configure->conditionClassName) {
+                $conditionClass = new $configure->conditionClassName();
+            }
+            $param = [$relationName, $conditionClass, $configure->cleanWithSoftDelete, $isForce];
             $configure->cleanQueue
                 ? CleansJob::dispatch($this->model->withoutRelations(), ...$param)->onQueue($configure->cleanQueue)
                 : CleansJob::dispatchSync($this->model, ...$param);

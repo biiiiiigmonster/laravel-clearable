@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Trait HasCleans
  *
- * @property array $cleans The relationships that should be deleted when deleted.
+ * @property array $cleans The relationships that will be auto-cleaned when deleted.
  * @property bool $cleanWithSoftDelete Determine if propagate soft delete to cleans.
  * @property string|null $cleanQueue Execute clean use the queue.
  * @package BiiiiiigMonster\Cleans\Concerns

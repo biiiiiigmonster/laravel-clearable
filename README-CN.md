@@ -34,23 +34,46 @@ composer require biiiiiigmonster/laravel-cleanable
 这个包可以很方便的帮您管理这些关联数据删除关系，仅仅只需要简单的定义。让我们来尝试一下吧！
 
 # 使用
-```php
+例如你的用户模型建立了一个手机模型关联，希望在删除了用户模型后能自动的清除其关联的手机模型数据。
+```injectablephp
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Post extends Model
-{
-    use Cleanable;
-    
-    protected array $cleanable = ['comments'];
-    
-    public function comments()
+class User extends Model
+{    
+    /**
+     * Get the phone associated with the user.
+     *
+     * @return HasOne
+     */
+    public function phone(): HasOne
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasOne(Phone::class);
     }
 }
 ```
-定义好这些关联后，
+To accomplish this, you may add the `BiiiiiigMonster\Cleans\Concerns\HasCleans` trait to the models you would like to auto-cleaned.
+After adding one of the traits to the model, add the attribute name to the `cleans` property of your model.
+```injectablephp
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use BiiiiiigMonster\Cleans\Concerns\HasCleans;
+
+class User extends Model
+{
+    use HasCleans;
+    
+    /**
+     * The relationships that will be auto-cleaned when deleted.
+     * 
+     * @var array 
+     */
+    protected $cleans = ['phone'];
+}
+```
+Once the relationship has been added to the `cleans` list, it will be auto-cleaned when deleted.
 # 协议
 [MIT](./LICENSE)

@@ -29,14 +29,14 @@ class CleansJob implements ShouldQueue
      *
      * @param Model $model
      * @param string $relationName
-     * @param CleansAttributes|null $condition
+     * @param CleansAttributes|null $conditionClass
      * @param bool $cleanWithSoftDelete
      * @param bool $isForce
      */
     public function __construct(
         protected Model $model,
         protected string $relationName,
-        protected ?CleansAttributes $condition = null,
+        protected ?CleansAttributes $conditionClass = null,
         protected bool $cleanWithSoftDelete = true,
         protected bool $isForce = false
     )
@@ -52,8 +52,8 @@ class CleansJob implements ShouldQueue
     {
         $cleanModels = collect($this->model->getRelationValue($this->relationName))
             ->filter(
-                static fn(Model $clean) => $this->condition instanceof CleansAttributes
-                    ? !$this->condition->retain($clean, $this->model)
+                static fn(Model $clean) => $this->conditionClass instanceof CleansAttributes
+                    ? !$this->conditionClass->retain($clean, $this->model)
                     : ($this->isForce || !$this->retainedDuringSoftDeletes())
             );
 
