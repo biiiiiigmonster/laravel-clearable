@@ -58,6 +58,6 @@ class CleanAttributesMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\Models\Cleans';
+        return $rootNamespace.'\Cleans';
     }
 }

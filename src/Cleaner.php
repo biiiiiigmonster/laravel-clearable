@@ -85,8 +85,7 @@ class Cleaner
         $rfc = new ReflectionClass($this->model);
         $methods = $rfc->getMethods(ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $method) {
-            $cleanAttributes = $method->getAttributes(Clean::class);
-            if (empty($cleanAttribute)) {
+            if (empty($cleanAttributes = $method->getAttributes(Clean::class))) {
                 continue;
             }
 
