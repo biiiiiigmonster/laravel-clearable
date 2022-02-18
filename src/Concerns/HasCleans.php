@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * Trait HasCleans
  *
  * @property array $cleans The relationships that will be auto-cleaned when deleted.
- * @property bool $cleanWithSoftDelete Determine if propagate soft delete to cleans.
+ * @property bool $cleanWithSoftDelete Determine if propagate soft delete to the cleans.
  * @property string|null $cleanQueue Execute clean use the queue.
  * @package BiiiiiigMonster\Cleans\Concerns
  */
@@ -67,6 +67,31 @@ trait HasCleans
     }
 
     /**
+     * Get cleanWithSoftDelete.
+     *
+     * @return bool
+     */
+    public function isCleanWithSoftDelete(): bool
+    {
+        return $this->cleanWithSoftDelete ?? false;
+    }
+
+    /**
+     * Set the cleanWithSoftDelete attributes for the model.
+     *
+     * @param bool $cleanWithSoftDelete
+     * @return $this
+     */
+    public function setCleanWithSoftDelete(bool $cleanWithSoftDelete): static
+    {
+        $this->cleanWithSoftDelete = $cleanWithSoftDelete;
+
+        return $this;
+    }
+
+    /**
+     * Get cleanQueue.
+     *
      * @return string|null
      */
     public function getCleanQueue(): ?string
@@ -75,30 +100,15 @@ trait HasCleans
     }
 
     /**
+     * Set the cleanQueue attributes for the model.
+     *
      * @param string|null $cleanQueue
+     * @return $this
      */
-    public function setCleanQueue(?string $cleanQueue): void
+    public function setCleanQueue(?string $cleanQueue): static
     {
         $this->cleanQueue = $cleanQueue;
-    }
 
-    /**
-     * Get cleanWithSoftDelete.
-     *
-     * @return bool
-     */
-    public function isCleanWithSoftDelete(): bool
-    {
-        return $this->cleanWithSoftDelete ?? true;
-    }
-
-    /**
-     * Set the cleanWithSoftDelete attributes for the model.
-     *
-     * @param bool $cleanWithSoftDelete
-     */
-    public function setCleanWithSoftDelete(bool $cleanWithSoftDelete): void
-    {
-        $this->cleanWithSoftDelete = $cleanWithSoftDelete;
+        return $this;
     }
 }

@@ -33,24 +33,25 @@ composer require biiiiiigmonster/laravel-cleanable
 
 这个包可以很方便的帮您管理这些关联数据删除关系，仅仅只需要简单的定义。让我们来尝试一下吧！
 
-# 使用
+## 使用
 例如你的用户模型建立了一个手机模型关联，希望在删除了用户模型后能自动的清除其关联的手机模型数据。
+
 ```injectablephp
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Model
 {    
     /**
-     * Get the phone associated with the user.
+     * Get the posts for the user.
      *
-     * @return HasOne
+     * @return HasMany
      */
-    public function phone(): HasOne
+    public function posts(): HasMany
     {
-        return $this->hasOne(Phone::class);
+        return $this->hasMany(Post::class);
     }
 }
 ```
@@ -71,9 +72,178 @@ class User extends Model
      * 
      * @var array 
      */
-    protected $cleans = ['phone'];
+    protected $cleans = ['posts'];
 }
 ```
 Once the relationship has been added to the `cleans` list, it will be auto-cleaned when deleted.
+
+### Cleaning At Runtime
+At runtime, you may instruct a model instance to using the `clean` or `setCleans` method just like [`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
+```injectablephp
+$user->clean('posts')->delete();
+
+$user->setCleans(['posts'])->delete();
+```
+
+### 条件性清理
+```injectablephp
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use BiiiiiigMonster\Cleans\Concerns\HasCleans;
+use App\Cleans\PostClean;
+
+class User extends Model
+{
+    use HasCleans;
+    
+    /**
+     * The relationships that will be auto-cleaned when deleted.
+     * 
+     * @var array 
+     */
+    protected $cleans = [
+        'posts' => PostClean::class
+    ];
+}
+```
+
+### 软删除传播
+
+```injectablephp
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use BiiiiiigMonster\Cleans\Concerns\HasCleans;
+use App\Cleans\PostClean;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class User extends Model
+{
+    use HasCleans, SoftDeletes;
+    
+    /**
+     * The relationships that will be auto-cleaned when deleted.
+     * 
+     * @var array 
+     */
+    protected $cleans = [
+        'posts' => [PostClean::class, true]
+    ];
+}
+```
+如果你想要给全部的cleans设置软删除传播，直接在模型中添加属性：
+
+```injectablephp
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use BiiiiiigMonster\Cleans\Concerns\HasCleans;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class User extends Model
+{
+    use HasCleans, SoftDeletes;
+    
+    /**
+     * Determine if propagate soft delete to the cleans.
+     * 
+     * @var bool 
+     */
+    protected $cleanWithSoftDelete = true;
+    
+    // ……
+}
+```
+Tips：`cleans`中关联存在此配置项时，会覆盖掉`cleanWithSoftDelete`的设置
+
+### 队列执行
+```injectablephp
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use BiiiiiigMonster\Cleans\Concerns\HasCleans;
+use App\Cleans\PostClean;
+
+class User extends Model
+{
+    use HasCleans;
+    
+    /**
+     * The relationships that will be auto-cleaned when deleted.
+     * 
+     * @var array 
+     */
+    protected $cleans = [
+        'posts' => [PostClean::class, true, 'cleaning']
+    ];
+}
+```
+Tips：`cleans`中如果要配置执行队列，在这之前一定要配置上软删除清理的值
+
+如果你想要给全部的cleans设置执行队列，直接在模型中添加属性：
+```injectablephp
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use BiiiiiigMonster\Cleans\Concerns\HasCleans;
+
+class User extends Model
+{
+    use HasCleans;
+    
+    /**
+     * Execute clean use the queue.
+     * 
+     * @var string|null 
+     */
+    protected $cleanQueue = 'cleaning';
+    
+    // ……
+}
+```
+Tips：`cleans`中关联存在此配置项时，会覆盖掉`cleanQueue`的设置
+
+Similarly, `setCleanWithSoftDelete` and `setCleanQueue` support at runtime too.
+```injectablephp
+$user->setCleanWithSoftDelete(true)->delete();
+
+$user->setCleanQueue('cleaning')->delete();
+```
+
+### 可清理关联类型
+
+### Attribute
+```injectablephp
+namespace App\Models;
+
+use BiiiiiigMonster\Cleans\Attributes\Clean;
+use BiiiiiigMonster\Cleans\Concerns\HasCleans;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class User extends Model
+{
+    use HasCleans;
+        
+    /**
+     * Get the posts for the user.
+     *
+     * @return HasMany
+     */
+    #[Clean(PostClean::class, true, 'cleaning')] 
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+}
+```
+Tips：`#[Clean]` Attribute 的配置优先级最高，会覆盖其`cleans`中的同名配置
+
+## Test
+```shell
+composer test
+```
+
 # 协议
 [MIT](./LICENSE)

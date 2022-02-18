@@ -37,7 +37,7 @@ class CleansJob implements ShouldQueue
         protected Model $model,
         protected string $relationName,
         protected ?CleansAttributes $conditionClass = null,
-        protected bool $cleanWithSoftDelete = true,
+        protected bool $cleanWithSoftDelete = false,
         protected bool $isForce = false
     )
     {

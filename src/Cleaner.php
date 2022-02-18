@@ -80,10 +80,15 @@ class Cleaner
         foreach ($this->model->getCleans() as $relationName => $configure) {
             if (is_numeric($relationName)) {
                 $relationName = $configure;
-                $configure = [];
+                $configure = [null];
             }
+            [$conditionClassName, $cleanWithSoftDelete, $cleanQueue] = (array)$configure;
 
-            $cleans[$relationName] = new Clean(...(array)$configure);
+            $cleans[$relationName] = new Clean(
+                $conditionClassName,
+                $cleanWithSoftDelete ?? $this->model->isCleanWithSoftDelete(),
+                $cleanQueue ?? $this->model->getCleanQueue()
+            );
         }
 
         // from clean attribute
