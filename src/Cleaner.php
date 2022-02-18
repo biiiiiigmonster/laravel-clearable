@@ -5,7 +5,7 @@ namespace BiiiiiigMonster\Cleans;
 
 
 use BiiiiiigMonster\Cleans\Attributes\Clean;
-use BiiiiiigMonster\Cleans\Jobs\CleanJob;
+use BiiiiiigMonster\Cleans\Jobs\CleansJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -57,8 +57,8 @@ class Cleaner
 
             $param = [$relationName, $configure->condition, $configure->cleanWithSoftDelete, $isForce];
             $configure->cleanQueue
-                ? CleanJob::dispatch($this->model->withoutRelations(), ...$param)->onQueue($configure->cleanQueue)
-                : CleanJob::dispatchSync($this->model, ...$param);
+                ? CleansJob::dispatch($this->model->withoutRelations(), ...$param)->onQueue($configure->cleanQueue)
+                : CleansJob::dispatchSync($this->model, ...$param);
         }
     }
 

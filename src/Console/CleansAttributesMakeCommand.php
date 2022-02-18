@@ -4,7 +4,7 @@ namespace BiiiiiigMonster\Cleans\Console;
 
 use Illuminate\Console\GeneratorCommand;
 
-class CleanAttributesMakeCommand extends GeneratorCommand
+class CleansAttributesMakeCommand extends GeneratorCommand
 {
     /**
      * The console command name.

@@ -4,10 +4,10 @@
 namespace BiiiiiigMonster\Cleans;
 
 
-use BiiiiiigMonster\Cleans\Console\CleanAttributesMakeCommand;
+use BiiiiiigMonster\Cleans\Console\CleansAttributesMakeCommand;
 use Illuminate\Support\ServiceProvider;
 
-class CleanServiceProvider extends ServiceProvider
+class CleansServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.
@@ -16,6 +16,6 @@ class CleanServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->commands(CleanAttributesMakeCommand::class);
+        $this->commands(CleansAttributesMakeCommand::class);
     }
 }

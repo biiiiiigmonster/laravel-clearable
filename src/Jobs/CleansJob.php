@@ -20,7 +20,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class CleanJob implements ShouldQueue
+class CleansJob implements ShouldQueue
 {
     use Dispatchable, Queueable, SerializesModels, InteractsWithQueue;
 
