@@ -70,7 +70,7 @@ class CleansJob implements ShouldQueue
             ),
             default => throw new NotAllowedCleansException(sprintf(
                 'The clean "%s::%s" is relationship of "%s", it not allowed to be cleaned.',
-                $this->model,
+                $this->model::class,
                 $this->relationName,
                 $relation::class
             ))

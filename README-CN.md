@@ -40,16 +40,15 @@ composer require biiiiiigmonster/laravel-cleanable
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Model
 {    
     /**
      * Get the posts for the user.
      *
-     * @return HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function posts(): HasMany
+    public function posts()
     {
         return $this->hasMany(Post::class);
     }
@@ -85,6 +84,7 @@ $user->clean('posts')->delete();
 $user->setCleans(['posts'])->delete();
 ```
 
+## 清理配置
 ### 条件性清理
 ```injectablephp
 namespace App\Models;
@@ -108,7 +108,7 @@ class User extends Model
 }
 ```
 
-### 软删除传播
+### 软删除清理
 
 ```injectablephp
 namespace App\Models;
@@ -132,7 +132,7 @@ class User extends Model
     ];
 }
 ```
-如果你想要给全部的cleans设置软删除传播，直接在模型中添加属性：
+如果你想要给全部的cleans设置软删除清理，直接在模型中添加属性：
 
 ```injectablephp
 namespace App\Models;
@@ -220,7 +220,6 @@ namespace App\Models;
 use BiiiiiigMonster\Cleans\Attributes\Clean;
 use BiiiiiigMonster\Cleans\Concerns\HasCleans;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Model
 {
@@ -229,16 +228,16 @@ class User extends Model
     /**
      * Get the posts for the user.
      *
-     * @return HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     #[Clean(PostClean::class, true, 'cleaning')] 
-    public function posts(): HasMany
+    public function posts()
     {
         return $this->hasMany(Post::class);
     }
 }
 ```
-Tips：`#[Clean]` Attribute 的配置优先级最高，会覆盖其`cleans`中的同名配置
+Tips：`#[Clean]` Attribute 的配置优先级最高，会覆盖`cleans`中的同名配置
 
 ## Test
 ```shell
