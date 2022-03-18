@@ -56,14 +56,11 @@ class Cleaner
             }
 
             /** @var Clean $configure */
-            $conditionClass = null;
-            if ($configure->conditionClassName) {
-                $conditionClass = new $configure->conditionClassName();
-            }
-            $param = [$relationName, $conditionClass, $configure->cleanWithSoftDelete, $isForce];
+            $cleansAttributes = $configure->cleansAttributesClassName ? new $configure->cleansAttributesClassName() : null;
+            $param = [$this->model, $relationName, $cleansAttributes, $configure->cleanWithSoftDelete, $isForce];
             $configure->cleanQueue
-                ? CleansJob::dispatch($this->model->withoutRelations(), ...$param)->onQueue($configure->cleanQueue)
-                : CleansJob::dispatchSync($this->model, ...$param);
+                ? CleansJob::dispatch(...$param)->onQueue($configure->cleanQueue)
+                : CleansJob::dispatchSync(...$param);
         }
     }
 
@@ -82,13 +79,8 @@ class Cleaner
                 $relationName = $configure;
                 $configure = [null];
             }
-            [$conditionClassName, $cleanWithSoftDelete, $cleanQueue] = (array)$configure;
 
-            $cleans[$relationName] = new Clean(
-                $conditionClassName,
-                $cleanWithSoftDelete ?? $this->model->isCleanWithSoftDelete(),
-                $cleanQueue ?? $this->model->getCleanQueue()
-            );
+            $cleans[$relationName] = new Clean(...(array)$configure);
         }
 
         // from clean attribute

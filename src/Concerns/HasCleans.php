@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Model;
  * Trait HasCleans
  *
  * @property array $cleans The relationships that will be auto-cleaned when deleted.
- * @property bool $cleanWithSoftDelete Determine if propagate soft delete to the cleans.
- * @property string|null $cleanQueue Execute clean use the queue.
  * @package BiiiiiigMonster\Cleans\Concerns
  */
 trait HasCleans
@@ -62,52 +60,6 @@ trait HasCleans
         $this->cleans = array_merge(
             $this->getCleans(), is_array($cleans) ? $cleans : func_get_args()
         );
-
-        return $this;
-    }
-
-    /**
-     * Get cleanWithSoftDelete.
-     *
-     * @return bool
-     */
-    public function isCleanWithSoftDelete(): bool
-    {
-        return $this->cleanWithSoftDelete ?? false;
-    }
-
-    /**
-     * Set the cleanWithSoftDelete attributes for the model.
-     *
-     * @param bool $cleanWithSoftDelete
-     * @return $this
-     */
-    public function setCleanWithSoftDelete(bool $cleanWithSoftDelete): static
-    {
-        $this->cleanWithSoftDelete = $cleanWithSoftDelete;
-
-        return $this;
-    }
-
-    /**
-     * Get cleanQueue.
-     *
-     * @return string|null
-     */
-    public function getCleanQueue(): ?string
-    {
-        return $this->cleanQueue;
-    }
-
-    /**
-     * Set the cleanQueue attributes for the model.
-     *
-     * @param string|null $cleanQueue
-     * @return $this
-     */
-    public function setCleanQueue(?string $cleanQueue): static
-    {
-        $this->cleanQueue = $cleanQueue;
 
         return $this;
     }
