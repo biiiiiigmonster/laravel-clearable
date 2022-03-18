@@ -52,7 +52,7 @@ class CleansJob implements ShouldQueue
     {
         $cleanModels = collect($this->model->getRelationValue($this->relationName))
             ->filter(
-                static fn(Model $clean) => $this->cleansAttributes instanceof CleansAttributes
+                fn(Model $clean) => $this->cleansAttributes instanceof CleansAttributes
                     ? !$this->cleansAttributes->retain($clean, $this->model)
                     : ($this->isForce || !$this->retainedDuringSoftDeletes())
             );
