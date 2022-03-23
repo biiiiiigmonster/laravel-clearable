@@ -35,7 +35,7 @@ composer require biiiiiigmonster/laravel-cleanable
 ## 使用
 例如你的用户模型建立了一个手机模型关联，希望在删除了用户模型后能自动的清除其关联的手机模型数据。
 
-```injectablephp
+```php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -55,7 +55,7 @@ class User extends Model
 ```
 To accomplish this, you may add the `BiiiiiigMonster\Cleans\Concerns\HasCleans` trait to the models you would like to auto-cleaned.
 After adding one of the traits to the model, add the attribute name to the `cleans` property of your model.
-```injectablephp
+```php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -77,7 +77,7 @@ Once the relationship has been added to the `cleans` list, it will be auto-clean
 
 ### Cleaning At Runtime
 At runtime, you may instruct a model instance to using the `clean` or `setCleans` method just like [`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
-```injectablephp
+```php
 $user->clean('posts')->delete();
 
 $user->setCleans(['posts'])->delete();
@@ -85,7 +85,7 @@ $user->setCleans(['posts'])->delete();
 
 ## 清理配置
 ### 条件性清理
-```injectablephp
+```php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -108,7 +108,7 @@ class User extends Model
 ```
 
 ### 软删除清理
-```injectablephp
+```php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -132,7 +132,7 @@ class User extends Model
 ```
 
 ### 队列执行
-```injectablephp
+```php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -155,7 +155,7 @@ class User extends Model
 ```
 
 ## Attribute
-```injectablephp
+```php
 namespace App\Models;
 
 use BiiiiiigMonster\Cleans\Attributes\Clean;
