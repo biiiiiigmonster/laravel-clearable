@@ -75,14 +75,6 @@ class User extends Model
 ```
 Once the relationship has been added to the `cleans` list, it will be auto-cleaned when deleted.
 
-### Cleaning At Runtime
-At runtime, you may instruct a model instance to using the `clean` or `setCleans` method just like [`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
-```php
-$user->clean('posts')->delete();
-
-$user->setCleans(['posts'])->delete();
-```
-
 ## 清理配置
 ### 条件性清理
 ```php
@@ -152,6 +144,14 @@ class User extends Model
         'posts' => [PostClean::class, true, 'cleaning']
     ];
 }
+```
+
+### Cleaning At Runtime
+At runtime, you may instruct a model instance to using the `clean` or `setCleans` method just like [`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
+```php
+$user->clean(['posts'=>[PostClean::class, true, 'cleaning']])->delete();
+
+$user->setCleans(['posts'=>[PostClean::class, true, 'cleaning']])->delete();
 ```
 
 ## Attribute
