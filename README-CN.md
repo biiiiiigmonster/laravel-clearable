@@ -8,7 +8,6 @@
     <a href="https://github.com/biiiiiigmonster/laravel-cleanable/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-7389D8.svg?style=flat" ></a>
     <a href="https://github.com/biiiiiigmonster/laravel-cleanable/releases" ><img src="https://img.shields.io/github/release/biiiiiigmonster/laravel-cleanable.svg?color=4099DE" /></a> 
     <a href="https://packagist.org/packages/biiiiiigmonster/laravel-cleanable"><img src="https://img.shields.io/packagist/dt/biiiiiigmonster/laravel-cleanable.svg?color=" /></a> 
-    <a><img src="https://img.shields.io/badge/php-8.0.2+-59a9f8.svg?style=flat" /></a> 
 </p>
 
 </div>
@@ -109,7 +108,6 @@ class User extends Model
 ```
 
 ### 软删除清理
-
 ```injectablephp
 namespace App\Models;
 
@@ -132,30 +130,6 @@ class User extends Model
     ];
 }
 ```
-如果你想要给全部的cleans设置软删除清理，直接在模型中添加属性：
-
-```injectablephp
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use BiiiiiigMonster\Cleans\Concerns\HasCleans;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-class User extends Model
-{
-    use HasCleans, SoftDeletes;
-    
-    /**
-     * Determine if propagate soft delete to the cleans.
-     * 
-     * @var bool 
-     */
-    protected $cleanWithSoftDelete = true;
-    
-    // ……
-}
-```
-Tips：`cleans`中关联存在此配置项时，会覆盖掉`cleanWithSoftDelete`的设置
 
 ### 队列执行
 ```injectablephp
@@ -179,47 +153,15 @@ class User extends Model
     ];
 }
 ```
-Tips：`cleans`中如果要配置执行队列，在这之前一定要配置上软删除清理的值
 
-如果你想要给全部的cleans设置执行队列，直接在模型中添加属性：
-```injectablephp
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use BiiiiiigMonster\Cleans\Concerns\HasCleans;
-
-class User extends Model
-{
-    use HasCleans;
-    
-    /**
-     * Execute clean use the queue.
-     * 
-     * @var string|null 
-     */
-    protected $cleanQueue = 'cleaning';
-    
-    // ……
-}
-```
-Tips：`cleans`中关联存在此配置项时，会覆盖掉`cleanQueue`的设置
-
-Similarly, `setCleanWithSoftDelete` and `setCleanQueue` support at runtime too.
-```injectablephp
-$user->setCleanWithSoftDelete(true)->delete();
-
-$user->setCleanQueue('cleaning')->delete();
-```
-
-### 可清理关联类型
-
-### Attribute
+## Attribute
 ```injectablephp
 namespace App\Models;
 
 use BiiiiiigMonster\Cleans\Attributes\Clean;
 use BiiiiiigMonster\Cleans\Concerns\HasCleans;
 use Illuminate\Database\Eloquent\Model;
+use App\Cleans\PostClean;
 
 class User extends Model
 {
@@ -230,7 +172,7 @@ class User extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    #[Clean(PostClean::class, true, 'cleaning')] 
+    #[Clean(cleansAttributesClassName: PostClean::class, cleanWithSoftDelete: true, cleanQueue: 'cleaning')] 
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -238,6 +180,23 @@ class User extends Model
 }
 ```
 Tips：`#[Clean]` Attribute 的配置优先级最高，会覆盖`cleans`中的同名配置
+
+## 可清理关联类型
+数据的"删除"一般都是较为敏感的操作，我们不希望重要的数据被其他关联定义上clean，因此我们只支持在父子关联的子关联中实现"删除"。
+
+支持列表：
+Illuminate\Database\Eloquent\Relations\HasOne;
+Illuminate\Database\Eloquent\Relations\HasOneThrough;
+Illuminate\Database\Eloquent\Relations\HasMany;
+Illuminate\Database\Eloquent\Relations\HasManyThrough;
+Illuminate\Database\Eloquent\Relations\MorphMany;
+Illuminate\Database\Eloquent\Relations\MorphOne;
+Illuminate\Database\Eloquent\Relations\BelongsToMany;
+Illuminate\Database\Eloquent\Relations\MorphToMany;
+Tips：`BelongsToMany`与`MorphToMany`关联定义clean时，删除的为中间表数据
+不支持列表：
+Illuminate\Database\Eloquent\Relations\BelongsTo;
+Illuminate\Database\Eloquent\Relations\MorphTo;
 
 ## Test
 ```shell

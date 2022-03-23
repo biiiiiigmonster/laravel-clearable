@@ -8,6 +8,9 @@ use BiiiiiigMonster\Cleans\Exceptions\NotAllowedCleansException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -19,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use LogicException;
 
 class CleansJob implements ShouldQueue
 {
@@ -50,41 +54,34 @@ class CleansJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $cleanModels = collect($this->model->getRelationValue($this->relationName))
-            ->filter(
-                fn(Model $clean) => $this->cleansAttributes instanceof CleansAttributes
-                    ? !$this->cleansAttributes->retain($clean, $this->model)
-                    : ($this->isForce || !$this->retainedDuringSoftDeletes())
-            );
-
+        /** @var Relation $relation */
         $relation = $this->model->{$this->relationName}();
+
+        // to be cleaned model.
+        $cleans = $relation->lazy()->filter(fn(Model $clean) =>
+            $this->cleansAttributes?->confirm($clean, $this->model)
+                ?? $this->isForce || $this->cleanWithSoftDelete || !Cleaner::hasSoftDeletes($this->model)
+        );
+
         match ($relation::class) {
             HasOne::class, HasOneThrough::class, MorphOne::class,
-            HasMany::class, HasManyThrough::class, MorphMany::class => $cleanModels->map(
-                static fn(Model $relationModel) => $this->isForce
-                    ? $relationModel->forceDelete()
-                    : $relationModel->delete()
-            ),
+            HasMany::class, HasManyThrough::class, MorphMany::class => $cleans->each(function (Model $clean){
+                $this->isForce ? $clean->forceDelete() : $clean->delete();
+            }),
             BelongsToMany::class, MorphToMany::class => $relation->detach(
-                $cleanModels->pluck($relation->getRelatedKeyName())
+                $cleans->pluck($relation->getRelatedKeyName())->all()
             ),
-            default => throw new NotAllowedCleansException(sprintf(
-                'The clean "%s::%s" is relationship of "%s", it not allowed to be cleaned.',
+            BelongsTo::class, MorphTo::class => throw new NotAllowedCleansException(sprintf(
+                '%s::%s is relationship of %s, it not allowed to be cleaned.',
                 $this->model::class,
                 $this->relationName,
                 $relation::class
+            )),
+            default => throw new LogicException(sprintf(
+                '%s::%s must return a relationship instance.',
+                $this->model::class,
+                $this->relationName
             ))
         };
-    }
-
-    /**
-     * Determine if the clean model retained during normal deleting.
-     *
-     * @return bool
-     */
-    protected function retainedDuringSoftDeletes(): bool
-    {
-        // The static model must have "SoftDeletes" trait and close propagate soft delete.
-        return Cleaner::hasSoftDeletes($this->model) && !$this->cleanWithSoftDelete;
     }
 }

@@ -7,9 +7,7 @@ namespace BiiiiiigMonster\Cleans;
 use BiiiiiigMonster\Cleans\Attributes\Clean;
 use BiiiiiigMonster\Cleans\Jobs\CleansJob;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -41,33 +39,24 @@ class Cleaner
      * Cleaner handle.
      *
      * @param bool $isForce
-     * @throws LogicException
      */
     public function handle(bool $isForce = false): void
     {
         $cleans = $this->parse();
 
         foreach ($cleans as $relationName => $configure) {
-            $relation = $this->model->$relationName();
-            if (!$relation instanceof Relation) {
-                throw new LogicException(
-                    sprintf('%s::%s must return a relationship instance.', $this->model::class, $relationName)
-                );
-            }
-
-            /** @var Clean $configure */
             $cleansAttributes = $configure->cleansAttributesClassName ? new $configure->cleansAttributesClassName() : null;
-            $param = [$this->model, $relationName, $cleansAttributes, $configure->cleanWithSoftDelete, $isForce];
+            $param = [$relationName, $cleansAttributes, $configure->cleanWithSoftDelete, $isForce];
             $configure->cleanQueue
-                ? CleansJob::dispatch(...$param)->onQueue($configure->cleanQueue)
-                : CleansJob::dispatchSync(...$param);
+                ? CleansJob::dispatch($this->model->withoutRelations(), ...$param)->onQueue($configure->cleanQueue)
+                : CleansJob::dispatchSync($this->model, ...$param);
         }
     }
 
     /**
      * Parse cleans of the model.
      *
-     * @return array
+     * @return array<string, Clean>
      */
     protected function parse(): array
     {
