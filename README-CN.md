@@ -154,7 +154,7 @@ $user->clean(['posts'=>[PostClean::class, true, 'cleaning']])->delete();
 $user->setCleans(['posts'=>[PostClean::class, true, 'cleaning']])->delete();
 ```
 
-## Attribute
+## PHP8 Attribute
 ```php
 namespace App\Models;
 
