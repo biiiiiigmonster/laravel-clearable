@@ -100,6 +100,8 @@ class User extends Model
 ```
 
 ### 软删除清理
+clean实际上是删除操作，当遇上父模型携带软删除特性时，子关联的清理就需要配置指示是否伴随删除。
+在关联的清理配置数组中第二个配置即可，它的默认值是`true`。
 ```php
 namespace App\Models;
 
@@ -122,8 +124,11 @@ class User extends Model
     ];
 }
 ```
+Tips：父模型执行`forceDelete`操作时，定义的关联一定会执行清理并且也是`forceDelete`操作
 
 ### 队列执行
+当我们需要清理的关联数据可能非常大时，使用队列去执行它是一个非常好的策略，
+让他工作同样非常的简单，只需在关联的清理配置数组中添加第三个值即可。
 ```php
 namespace App\Models;
 
@@ -145,9 +150,13 @@ class User extends Model
     ];
 }
 ```
+像这样定义完成后，posts关联的clean操作将放置到自定义的队列中去执行，减少了并行的压力。
+
+Tips：清理配置数组值的顺序不能混乱，配置时需遵守默认的顺序。
 
 ### Cleaning At Runtime
-At runtime, you may instruct a model instance to using the `clean` or `setCleans` method just like [`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
+At runtime, you may instruct a model instance to using the `clean` or `setCleans` method just like 
+[`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
 ```php
 $user->clean(['posts'=>[PostClean::class, true, 'cleaning']])->delete();
 
@@ -155,6 +164,9 @@ $user->setCleans(['posts'=>[PostClean::class, true, 'cleaning']])->delete();
 ```
 
 ## PHP8 Attribute
+在php8中为我们引入了Attribute的特性，它提供了另外一种形式的配置，clean也已经为他做好了准备。
+
+使用Attribute非常的简单，我们定义了一个`#[Clean]`的Attribute，你只需要在对应的关联方法中引入即可。
 ```php
 namespace App\Models;
 
@@ -179,7 +191,9 @@ class User extends Model
     }
 }
 ```
-Tips：`#[Clean]` Attribute 的配置优先级最高，会覆盖`cleans`中的同名配置
+Clean Attribute同样支持清理配置，甚至因为named参数特性，你可以自由的输入你只想配置的参数，没有严格的顺序要求。
+
+Tips：`#[Clean]` Attribute 的配置优先级最高，会覆盖`protected $cleans`中同名的配置
 
 ## 可清理关联类型
 数据的"删除"一般都是较为敏感的操作，我们不希望重要的数据被其他关联定义上clean，因此我们只支持在父子关联的子关联中实现"删除"。
