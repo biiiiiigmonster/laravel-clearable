@@ -3,7 +3,6 @@
 namespace BiiiiiigMonster\Cleans\Attributes;
 
 use Attribute;
-use BiiiiiigMonster\Cleans\Contracts\CleansAttributes;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class Clean
