@@ -1,10 +1,8 @@
 <?php
 
-namespace BiiiiiigMonster\Cleans\Jobs;
+namespace BiiiiiigMonster\Clears\Jobs;
 
-use BiiiiiigMonster\Cleans\Cleaner;
-use BiiiiiigMonster\Cleans\Contracts\CleansAttributes;
-use BiiiiiigMonster\Cleans\Exceptions\NotAllowedCleansException;
+use BiiiiiigMonster\Clears\Exceptions\NotAllowedClearsException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -24,55 +22,55 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
 
-class CleansJob implements ShouldQueue
+class ClearsJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, SerializesModels, InteractsWithQueue;
+    use Dispatchable;
+    use Queueable;
+    use SerializesModels;
+    use InteractsWithQueue;
 
     /**
-     * CleanJob constructor.
+     * ClearJob constructor.
      *
      * @param Model $model
      * @param string $relationName
-     * @param CleansAttributes|null $cleansAttributes
-     * @param bool $cleanWithSoftDelete
-     * @param bool $isForce
+     * @param string|null $clearsAttributesClassName
      */
     public function __construct(
         protected Model $model,
         protected string $relationName,
-        protected ?CleansAttributes $cleansAttributes = null,
-        protected bool $cleanWithSoftDelete = false,
-        protected bool $isForce = false
-    )
-    {
+        protected ?string $clearsAttributesClassName = null,
+    ) {
     }
 
     /**
-     * CleanJob handle.
+     * ClearJob handle.
      *
-     * @throws NotAllowedCleansException
+     * @throws NotAllowedClearsException
      */
     public function handle(): void
     {
         /** @var Relation $relation */
         $relation = $this->model->{$this->relationName}();
 
-        // to be cleaned model.
-        $cleans = $relation->lazy()->filter(fn(Model $clean) =>
-            $this->cleansAttributes?->confirm($clean, $this->model)
-                ?? $this->isForce || $this->cleanWithSoftDelete || !Cleaner::hasSoftDeletes($this->model)
-        );
+        // to be cleared model.
+        $clears = $relation->lazy();
+        if ($this->clearsAttributesClassName) {
+            $clears = $clears->filter(
+                fn (Model $clear) => call_user_func("$this->clearsAttributesClassName::confirm", $clear, $this->model)
+            );
+        }
 
         match ($relation::class) {
             HasOne::class, HasOneThrough::class, MorphOne::class,
-            HasMany::class, HasManyThrough::class, MorphMany::class => $cleans->each(function (Model $clean){
-                $this->isForce ? $clean->forceDelete() : $clean->delete();
-            }),
-            BelongsToMany::class, MorphToMany::class => $relation->detach(
-                $cleans->pluck($relation->getRelatedKeyName())->all()
+            HasMany::class, HasManyThrough::class, MorphMany::class => $clears->each(
+                fn (Model $clear) => $clear->delete()
             ),
-            BelongsTo::class, MorphTo::class => throw new NotAllowedCleansException(sprintf(
-                '%s::%s is relationship of %s, it not allowed to be cleaned.',
+            BelongsToMany::class, MorphToMany::class => $relation->detach(
+                $clears->pluck($relation->getRelatedKeyName())->all()
+            ),
+            BelongsTo::class, MorphTo::class => throw new NotAllowedClearsException(sprintf(
+                '%s::%s is relationship of %s, it not allowed to be cleared.',
                 $this->model::class,
                 $this->relationName,
                 $relation::class

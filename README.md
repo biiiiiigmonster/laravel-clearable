@@ -5,9 +5,9 @@ English | [中文](./README-CN.md)
 # LARAVEL ELOQUENT TRAIT
 
 <p>
-    <a href="https://github.com/biiiiiigmonster/laravel-cleanable/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-7389D8.svg?style=flat" ></a>
-    <a href="https://github.com/biiiiiigmonster/laravel-cleanable/releases" ><img src="https://img.shields.io/github/release/biiiiiigmonster/laravel-cleanable.svg?color=4099DE" /></a> 
-    <a href="https://packagist.org/packages/biiiiiigmonster/laravel-cleanable"><img src="https://img.shields.io/packagist/dt/biiiiiigmonster/laravel-cleanable.svg?color=" /></a> 
+    <a href="https://github.com/biiiiiigmonster/laravel-clearable/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-7389D8.svg?style=flat" ></a>
+    <a href="https://github.com/biiiiiigmonster/laravel-clearable/releases" ><img src="https://img.shields.io/github/release/biiiiiigmonster/laravel-clearable.svg?color=4099DE" /></a> 
+    <a href="https://packagist.org/packages/biiiiiigmonster/laravel-clearable"><img src="https://img.shields.io/packagist/dt/biiiiiigmonster/laravel-clearable.svg?color=" /></a> 
 </p>
 
 </div>
@@ -22,7 +22,7 @@ English | [中文](./README-CN.md)
 # Installation
 
 ```bash
-composer require biiiiiigmonster/laravel-cleanable
+composer require biiiiiigmonster/laravel-clearable
 ```
 
 # Introductions

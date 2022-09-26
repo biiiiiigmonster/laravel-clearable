@@ -1,5 +1,5 @@
 {
-    "name": "biiiiiigmonster/laravel-cleanable",
+    "name": "biiiiiigmonster/laravel-clearable",
     "description": "Laravel framework eloquent trait",
     "type": "library",
     "keywords": ["laravel", "orm", "trait"],
@@ -13,16 +13,38 @@
     "require": {
         "laravel/framework": "^9.0"
     },
+    "require-dev": {
+        "laravel/pint": "^1.1",
+        "phpunit/phpunit": "^9",
+        "orchestra/testbench": "^7.7",
+        "pestphp/pest": "^1.22",
+        "pestphp/pest-plugin-laravel": "^1.2"
+    },
     "autoload": {
         "psr-4": {
-            "BiiiiiigMonster\\Cleans\\": "src/"
+            "BiiiiiigMonster\\Clears\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BiiiiiigMonster\\Clears\\Tests\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "BiiiiiigMonster\\Cleans\\CleansServiceProvider"
+                "BiiiiiigMonster\\Clears\\ClearsServiceProvider"
             ]
         }
-    }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

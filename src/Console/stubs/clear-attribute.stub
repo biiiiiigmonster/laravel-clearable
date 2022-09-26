@@ -1,0 +1,21 @@
+<?php
+
+namespace {{ namespace }};
+
+use BiiiiiigMonster\Clears\Contracts\ClearsAttributes;
+use Illuminate\Database\Eloquent\Model;
+
+class {{ class }} implements ClearsAttributes
+{
+    /**
+     * Decide if the clearable cleared.
+     *
+     * @param Model $clear
+     * @param Model $model
+     * @return bool
+     */
+    public function confirm(Model $clear, Model $model): bool
+    {
+        //
+    }
+}

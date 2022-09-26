@@ -1,17 +1,17 @@
 <?php
 
-namespace BiiiiiigMonster\Cleans\Console;
+namespace BiiiiiigMonster\Clears\Console;
 
 use Illuminate\Console\GeneratorCommand;
 
-class CleansAttributesMakeCommand extends GeneratorCommand
+class ClearsAttributesMakeCommand extends GeneratorCommand
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'make:clean';
+    protected $name = 'make:clear';
 
     /**
      * The name of the console command.
@@ -20,21 +20,21 @@ class CleansAttributesMakeCommand extends GeneratorCommand
      *
      * @var string|null
      */
-    protected static $defaultName = 'make:clean';
+    protected static $defaultName = 'make:clear';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new clean attribute';
+    protected $description = 'Create a new clear attribute';
 
     /**
      * The type of class being generated.
      *
      * @var string
      */
-    protected $type = 'Clean';
+    protected $type = 'Clear';
 
     /**
      * Get the stub file for the generator.
@@ -43,7 +43,7 @@ class CleansAttributesMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $relativePath = '/stubs/clean-attribute.stub';
+        $relativePath = '/stubs/clear-attribute.stub';
 
         return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
             ? $customPath
@@ -58,6 +58,6 @@ class CleansAttributesMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\Cleans';
+        return $rootNamespace.'\Clears';
     }
 }
