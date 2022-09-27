@@ -35,7 +35,7 @@ composer require biiiiiigmonster/laravel-clearable
 ## 使用
 例如你的用户模型建立了一个手机模型关联，希望在删除了用户模型后能自动的清除其关联的手机模型数据。
 
-```php
+```injectablephp
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -55,7 +55,7 @@ class User extends Model
 ```
 To accomplish this, you may add the `BiiiiiigMonster\Clears\Concerns\HasClears` trait to the models you would like to auto-clear.
 After adding one of the traits to the model, add the attribute name to the `clears` property of your model.
-```php
+```injectablephp
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -76,8 +76,41 @@ class User extends Model
 Once the relationship has been added to the `clears` list, it will be auto-clear when deleted.
 
 ## 清除配置
-### 条件性清除
-```php
+### 自定义清除
+有时我们需要自定义清除的逻辑，可以通过定义一个实现`ClearsAttributes`接口的类来实现这一点。
+
+要生成新的清除对象，您可以使用 `make:clear` Artisan 命令。Laravel 会将新的清除对象放在`app/Clears`目录中。 如果此目录不存在，Laravel 将在您执行 Artisan 命令创建规则时创建它：
+```bash
+php artisan make:clear PostClear
+```
+
+实现这个接口的类必须定义一个`confirm`方法，`confirm`方法能决定这个即将被清理的模型是否被保留。作为示例，`User`被删除时，我们将保留他已发布状态的`Post`关联数据。
+```injectablephp
+<?php
+
+namespace App\Clears;
+
+use BiiiiiigMonster\Clears\Contracts\ClearsAttributes;
+use Illuminate\Database\Eloquent\Model;
+
+class PostClear implements ClearsAttributes
+{
+    /**
+     * Decide if the clearable cleared.
+     *
+     * @param Model $post
+     * @param Model $user
+     * @return bool
+     */
+    public function confirm(Model $post, Model $user): bool
+    {
+        return $post->status === 'published';
+    }
+}
+```
+
+Once you have defined a custom clear type, you may attach it to a model attribute using its class name:
+```injectablephp
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -99,37 +132,10 @@ class User extends Model
 }
 ```
 
-### 软删除清除
-clear实际上是删除操作，当遇上父模型携带软删除特性时，子关联的清除就需要配置指示是否伴随删除。
-在关联的清除配置数组中第二个配置即可，它的默认值是`true`。
-```php
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use BiiiiiigMonster\Clears\Concerns\HasClears;
-use App\Clears\PostClear;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-class User extends Model
-{
-    use HasClears, SoftDeletes;
-    
-    /**
-     * The relationships that will be auto-clear when deleted.
-     * 
-     * @var array 
-     */
-    protected $clears = [
-        'posts' => [PostClear::class, true]
-    ];
-}
-```
-Tips：父模型执行`forceDelete`操作时，定义的关联一定会执行清除并且也是`forceDelete`操作
-
 ### 队列执行
 当我们需要清除的关联数据可能非常大时，使用队列去执行它是一个非常好的策略，
 让他工作同样非常的简单，只需在关联的清除配置数组中添加第三个值即可。
-```php
+```injectablephp
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -146,7 +152,7 @@ class User extends Model
      * @var array 
      */
     protected $clears = [
-        'posts' => [PostClear::class, true, 'clearing']
+        'posts' => [PostClear::class, 'clearQueue']
     ];
 }
 ```
@@ -157,17 +163,17 @@ Tips：清除配置数组值的顺序不能混乱，配置时需遵守默认的�
 ### Clearing At Runtime
 At runtime, you may instruct a model instance to using the `clear` or `setClears` method just like 
 [`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
-```php
-$user->clear(['posts'=>[PostClear::class, true, 'clearing']])->delete();
+```injectablephp
+$user->clear(['posts'=>[PostClear::class, 'clearQueue']])->delete();
 
-$user->setClears(['posts'=>[PostClear::class, true, 'clearing']])->delete();
+$user->setClears(['posts'=>[PostClear::class, 'clearQueue']])->delete();
 ```
 
 ## PHP8 Attribute
 在php8中为我们引入了Attribute的特性，它提供了另外一种形式的配置，clear也已经为他做好了准备。
 
 使用Attribute非常的简单，我们定义了一个`#[Clear]`的Attribute，你只需要在对应的关联方法中引入即可。
-```php
+```injectablephp
 namespace App\Models;
 
 use BiiiiiigMonster\Clears\Attributes\Clear;
@@ -184,16 +190,14 @@ class User extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    #[Clear(clearsAttributesClassName: PostClear::class, clearWithSoftDelete: true, clearQueue: 'clearing')] 
+    #[Clear(PostClear::class, 'clearQueue')] 
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
 }
 ```
-Clear Attribute同样支持清除配置，甚至因为named参数特性，你可以自由的输入你只想配置的参数，没有严格的顺序要求。
-
-Tips：`#[Clear]` Attribute 的配置优先级最高，会覆盖`protected $clears`中同名的配置
+Tips：`#[Clear]` Attribute 的配置优先级最高，会覆盖`protected $clears`中对应关联的配置
 
 ## 可清除关联类型
 数据的"删除"一般都是较为敏感的操作，我们不希望重要的数据被其他关联定义上clear，因此我们只支持在父子关联的子关联中实现"删除"。
@@ -213,7 +217,7 @@ Illuminate\Database\Eloquent\Relations\BelongsTo;
 Illuminate\Database\Eloquent\Relations\MorphTo;
 
 ## Test
-```shell
+```bash
 composer test
 ```
 
