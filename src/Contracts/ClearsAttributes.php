@@ -13,5 +13,5 @@ interface ClearsAttributes
      * @param Model $model
      * @return bool
      */
-    public function confirm(Model $clear, Model $model): bool;
+    public function reserve(Model $clear, Model $model): bool;
 }

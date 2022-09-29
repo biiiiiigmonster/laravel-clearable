@@ -43,7 +43,7 @@ class ClearsAttributesMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $relativePath = '/stubs/clear-attribute.stub';
+        $relativePath = '/stubs/clears-attributes.stub';
 
         return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
             ? $customPath

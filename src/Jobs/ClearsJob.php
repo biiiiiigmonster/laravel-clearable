@@ -56,14 +56,14 @@ class ClearsJob implements ShouldQueue
         // to be cleared model.
         $clears = $relation->lazy();
         if ($this->clearsAttributesClassName) {
-            $clears = $clears->filter(
-                fn (Model $clear) => call_user_func("$this->clearsAttributesClassName::confirm", $clear, $this->model)
+            $clears = $clears->reject(
+                fn (Model $clear) => call_user_func("$this->clearsAttributesClassName::reserve", $clear, $this->model)
             );
         }
 
         match ($relation::class) {
             HasOne::class, HasOneThrough::class, MorphOne::class,
-            HasMany::class, HasManyThrough::class, MorphMany::class => $clears->each(
+            HasMany::class, HasManyThrough::class, MorphMany::class => $clears->map(
                 fn (Model $clear) => $clear->delete()
             ),
             BelongsToMany::class, MorphToMany::class => $relation->detach(

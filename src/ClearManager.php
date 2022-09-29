@@ -38,10 +38,10 @@ class ClearManager
     {
         $clears = $this->parse();
 
-        foreach ($clears as $relationName => $configure) {
-            $param = [$relationName, $configure->clearsAttributesClassName];
-            $configure->clearQueue
-                ? ClearsJob::dispatch($this->model->withoutRelations(), ...$param)->onQueue($configure->clearQueue)
+        foreach ($clears as $relationName => $clear) {
+            $param = [$relationName, $clear->clearsAttributesClassName];
+            $clear->clearQueue
+                ? ClearsJob::dispatch($this->model->withoutRelations(), ...$param)->onQueue($clear->clearQueue)
                 : ClearsJob::dispatchSync($this->model, ...$param);
         }
     }
@@ -56,13 +56,13 @@ class ClearManager
         $clears = [];
 
         // from clears array
-        foreach ($this->model->getClears() as $relationName => $configure) {
+        foreach ($this->model->getClears() as $relationName => $clearsAttributesClassName) {
             if (is_numeric($relationName)) {
-                $relationName = $configure;
-                $configure = [null];
+                $relationName = $clearsAttributesClassName;
+                $clearsAttributesClassName = null;
             }
 
-            $clears[$relationName] = new Clear(...(array)$configure);
+            $clears[$relationName] = new Clear($clearsAttributesClassName, $this->model->getClearQueue());
         }
 
         // from clear attribute

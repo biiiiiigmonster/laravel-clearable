@@ -79,12 +79,13 @@ Once the relationship has been added to the `clears` list, it will be auto-clear
 ### 自定义清除
 有时我们需要自定义清除的逻辑，可以通过定义一个实现`ClearsAttributes`接口的类来实现这一点。
 
-要生成新的清除对象，您可以使用 `make:clear` Artisan 命令。Laravel 会将新的清除对象放在`app/Clears`目录中。 如果此目录不存在，Laravel 将在您执行 Artisan 命令创建规则时创建它：
+要生成新的清除对象，您可以使用 `make:clear` Artisan 命令。Clearable 会将新的清除对象放在`app/Clears`目录中。 如果此目录不存在，Clearable 将在您执行 Artisan 命令创建规则时创建它：
 ```bash
 php artisan make:clear PostClear
 ```
 
-实现这个接口的类必须定义一个`confirm`方法，`confirm`方法能决定这个即将被清理的模型是否被保留。作为示例，`User`被删除时，我们将保留他已发布状态的`Post`关联数据。
+实现这个接口的类必须定义一个`reserve`方法，`reserve`方法能决定这个即将被清理的模型是否被保留。作为示例，`User`被删除时，我们将保留他已发布状态的`Post`关联数据。
+
 ```injectablephp
 <?php
 
@@ -102,7 +103,7 @@ class PostClear implements ClearsAttributes
      * @param Model $user
      * @return bool
      */
-    public function confirm(Model $post, Model $user): bool
+    public function reserve(Model $post, Model $user): bool
     {
         return $post->status === 'published';
     }
@@ -134,7 +135,7 @@ class User extends Model
 
 ### 队列执行
 当我们需要清除的关联数据可能非常大时，使用队列去执行它是一个非常好的策略，
-让他工作同样非常的简单，只需在关联的清除配置数组中添加第三个值即可。
+让他工作同样非常的简单，add the attribute name to the `clearQueue` property of your model.
 ```injectablephp
 namespace App\Models;
 
@@ -147,26 +148,22 @@ class User extends Model
     use HasClears;
     
     /**
-     * The relationships that will be auto-clear when deleted.
+     * The clearable that will be dispatch on this name queue.
      * 
-     * @var array 
+     * @var string 
      */
-    protected $clears = [
-        'posts' => [PostClear::class, 'clearQueue']
-    ];
+    protected $clearQueue = 'clearQueue';
 }
 ```
 像这样定义完成后，posts关联的clear操作将放置到自定义的队列中去执行，减少了并行的压力。
-
-Tips：清除配置数组值的顺序不能混乱，配置时需遵守默认的顺序。
 
 ### Clearing At Runtime
 At runtime, you may instruct a model instance to using the `clear` or `setClears` method just like 
 [`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
 ```injectablephp
-$user->clear(['posts'=>[PostClear::class, 'clearQueue']])->delete();
+$user->clear(['posts' => PostClear::class])->delete();
 
-$user->setClears(['posts'=>[PostClear::class, 'clearQueue']])->delete();
+$user->setClears(['posts' => PostClear::class])->delete();
 ```
 
 ## PHP8 Attribute
@@ -179,7 +176,6 @@ namespace App\Models;
 use BiiiiiigMonster\Clears\Attributes\Clear;
 use BiiiiiigMonster\Clears\Concerns\HasClears;
 use Illuminate\Database\Eloquent\Model;
-use App\Clears\PostClear;
 
 class User extends Model
 {
@@ -190,11 +186,19 @@ class User extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    #[Clear(PostClear::class, 'clearQueue')] 
+    #[Clear] 
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
+}
+```
+同样的，你可以在`#[Clear]`中传入自定义清除，甚至单独配置`clearQueue`：
+```injectablephp
+#[Clear(PostClear::class, 'clearQueue')]
+public function posts()
+{
+    return $this->hasMany(Post::class);
 }
 ```
 Tips：`#[Clear]` Attribute 的配置优先级最高，会覆盖`protected $clears`中对应关联的配置
