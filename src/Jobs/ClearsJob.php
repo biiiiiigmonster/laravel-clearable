@@ -3,6 +3,7 @@
 namespace BiiiiiigMonster\Clears\Jobs;
 
 use BiiiiiigMonster\Clears\Exceptions\NotAllowedClearsException;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
+use ReflectionMethod;
 
 class ClearsJob implements ShouldQueue
 {
@@ -55,10 +57,10 @@ class ClearsJob implements ShouldQueue
 
         // to be cleared model.
         $clears = $relation->lazy();
-        if ($this->clearsAttributesClassName) {
-            $clears = $clears->reject(
-                fn (Model $clear) => call_user_func("$this->clearsAttributesClassName::reserve", $clear, $this->model)
-            );
+        try {
+            $rfc = new ReflectionMethod($this->clearsAttributesClassName, 'reserve');
+            $clears = $clears->reject(fn (Model $clear) => $rfc->invokeArgs(null, [$clear, $this->model]));
+        } catch (Exception) {
         }
 
         match ($relation::class) {
