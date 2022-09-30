@@ -1,6 +1,6 @@
 <?php
 
-namespace BiiiiiigMonster\Clears\Console;
+namespace BiiiiiigMonster\Clearable\Console;
 
 use Illuminate\Console\GeneratorCommand;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace BiiiiiigMonster\Clears;
+namespace BiiiiiigMonster\Clearable;
 
-use BiiiiiigMonster\Clears\Console\ClearsAttributesMakeCommand;
+use BiiiiiigMonster\Clearable\Console\ClearsAttributesMakeCommand;
 use Illuminate\Support\ServiceProvider;
 
 class ClearsServiceProvider extends ServiceProvider

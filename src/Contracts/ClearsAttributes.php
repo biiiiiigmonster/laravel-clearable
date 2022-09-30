@@ -1,6 +1,6 @@
 <?php
 
-namespace BiiiiiigMonster\Clears\Contracts;
+namespace BiiiiiigMonster\Clearable\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 

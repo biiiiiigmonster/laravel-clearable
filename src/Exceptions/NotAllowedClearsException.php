@@ -1,6 +1,6 @@
 <?php
 
-namespace BiiiiiigMonster\Clears\Exceptions;
+namespace BiiiiiigMonster\Clearable\Exceptions;
 
 use Exception;
 

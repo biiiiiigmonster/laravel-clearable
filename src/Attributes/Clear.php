@@ -1,6 +1,6 @@
 <?php
 
-namespace BiiiiiigMonster\Clears\Attributes;
+namespace BiiiiiigMonster\Clearable\Attributes;
 
 use Attribute;
 

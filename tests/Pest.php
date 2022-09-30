@@ -1,5 +1,5 @@
 <?php
 
-use BiiiiiigMonster\Clears\Tests\TestCase;
+use BiiiiiigMonster\Clearable\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

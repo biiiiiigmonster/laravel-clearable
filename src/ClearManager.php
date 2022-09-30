@@ -1,9 +1,9 @@
 <?php
 
-namespace BiiiiiigMonster\Clears;
+namespace BiiiiiigMonster\Clearable;
 
-use BiiiiiigMonster\Clears\Attributes\Clear;
-use BiiiiiigMonster\Clears\Jobs\ClearsJob;
+use BiiiiiigMonster\Clearable\Attributes\Clear;
+use BiiiiiigMonster\Clearable\Jobs\ClearsJob;
 use Illuminate\Database\Eloquent\Model;
 use ReflectionClass;
 use ReflectionMethod;

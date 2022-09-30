@@ -1,8 +1,8 @@
 <?php
 
-namespace BiiiiiigMonster\Clears\Concerns;
+namespace BiiiiiigMonster\Clearable\Concerns;
 
-use BiiiiiigMonster\Clears\ClearManager;
+use BiiiiiigMonster\Clearable\ClearManager;
 use Illuminate\Database\Eloquent\Model;
 
 /**

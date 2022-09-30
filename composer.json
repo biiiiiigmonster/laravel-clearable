@@ -15,25 +15,26 @@
     },
     "require-dev": {
         "laravel/pint": "^1.1",
-        "phpunit/phpunit": "^9",
         "orchestra/testbench": "^7.7",
         "pestphp/pest": "^1.22",
-        "pestphp/pest-plugin-laravel": "^1.2"
+        "pestphp/pest-plugin-laravel": "^1.2",
+        "phpunit/phpunit": "^9"
     },
     "autoload": {
         "psr-4": {
-            "BiiiiiigMonster\\Clears\\": "src"
+            "BiiiiiigMonster\\Clearable\\": "src",
+            "BiiiiiigMonster\\Clearable\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "BiiiiiigMonster\\Clears\\Tests\\": "tests"
+            "BiiiiiigMonster\\Clearable\\Tests\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "BiiiiiigMonster\\Clears\\ClearsServiceProvider"
+                "BiiiiiigMonster\\Clearable\\ClearsServiceProvider"
             ]
         }
     },

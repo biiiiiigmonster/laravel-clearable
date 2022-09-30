@@ -1,8 +1,8 @@
 <?php
 
-namespace BiiiiiigMonster\Clears\Jobs;
+namespace BiiiiiigMonster\Clearable\Jobs;
 
-use BiiiiiigMonster\Clears\Exceptions\NotAllowedClearsException;
+use BiiiiiigMonster\Clearable\Exceptions\NotAllowedClearsException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
