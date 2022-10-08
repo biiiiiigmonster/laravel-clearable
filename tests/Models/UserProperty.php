@@ -11,12 +11,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-class User extends Model
+class UserProperty extends Model
 {
     use HasFactory;
     use HasClears;
 
     protected $table = 'users';
+
+    protected $clears = ['posts'];
 
     public function country(): BelongsTo
     {

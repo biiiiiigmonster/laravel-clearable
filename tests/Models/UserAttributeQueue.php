@@ -2,6 +2,7 @@
 
 namespace BiiiiiigMonster\Clearable\Tests\Models;
 
+use BiiiiiigMonster\Clearable\Attributes\Clear;
 use BiiiiiigMonster\Clearable\Concerns\HasClears;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-class User extends Model
+class UserAttributeQueue extends Model
 {
     use HasFactory;
     use HasClears;
@@ -38,6 +39,7 @@ class User extends Model
         return $this->hasOne(History::class);
     }
 
+    #[Clear]
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'user_id');

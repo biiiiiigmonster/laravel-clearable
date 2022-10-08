@@ -8,7 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -17,12 +16,13 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
+use ReflectionException;
 use ReflectionMethod;
-use Throwable;
 
 class ClearsJob implements ShouldQueue
 {
@@ -34,13 +34,15 @@ class ClearsJob implements ShouldQueue
     /**
      * ClearJob constructor.
      *
-     * @param Model $model
+     * @param string $className
      * @param string $relationName
+     * @param EloquentCollection $collection
      * @param string|null $clearsAttributesClassName
      */
     public function __construct(
-        protected Model $model,
+        protected string $className,
         protected string $relationName,
+        protected EloquentCollection $collection,
         protected ?string $clearsAttributesClassName = null,
     ) {
     }
@@ -49,21 +51,19 @@ class ClearsJob implements ShouldQueue
      * ClearJob handle.
      *
      * @throws NotAllowedClearsException
+     * @throws ReflectionException
      */
     public function handle(): void
     {
-        /** @var Relation $relation */
-        $relation = $this->model->{$this->relationName}();
+        $rfc = new ReflectionMethod($this->className, $this->relationName);
+        $relation = (string) $rfc->getReturnType();
 
         // to be cleared model.
-        $clears = $relation->lazy();
-        try {
-            $rfc = new ReflectionMethod($this->clearsAttributesClassName, 'reserve');
-            $clears = $clears->reject(fn (Model $clear) => $rfc->invokeArgs(null, [$clear, $this->model]));
-        } catch (Throwable) {
-        }
+        $clears = $this->clearsAttributesClassName
+            ? $this->collection->filter(fn (Model $clear) => (new $this->clearsAttributesClassName())->abandon($clear))
+            : $this->collection;
 
-        match ($relation::class) {
+        match ($relation) {
             HasOne::class, HasOneThrough::class, MorphOne::class,
             HasMany::class, HasManyThrough::class, MorphMany::class => $clears->map(
                 fn (Model $clear) => $clear->delete()
@@ -73,13 +73,13 @@ class ClearsJob implements ShouldQueue
             ),
             BelongsTo::class, MorphTo::class => throw new NotAllowedClearsException(sprintf(
                 '%s::%s is relationship of %s, it not allowed to be cleared.',
-                $this->model::class,
+                $this->className,
                 $this->relationName,
-                $relation::class
+                $relation
             )),
             default => throw new LogicException(sprintf(
                 '%s::%s must return a relationship instance.',
-                $this->model::class,
+                $this->className,
                 $this->relationName
             ))
         };

@@ -10,8 +10,7 @@ interface ClearsAttributes
      * Decide if the clearable cleared.
      *
      * @param Model $clear
-     * @param Model $model
      * @return bool
      */
-    public function reserve(Model $clear, Model $model): bool;
+    public function abandon(Model $clear): bool;
 }

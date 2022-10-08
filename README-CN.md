@@ -84,7 +84,7 @@ Once the relationship has been added to the `clears` list, it will be auto-clear
 php artisan make:clear PostClear
 ```
 
-实现这个接口的类必须定义一个`reserve`方法，`reserve`方法能决定这个即将被清理的模型是否被保留。作为示例，`User`被删除时，我们将保留他已发布状态的`Post`关联数据。
+实现这个接口的类必须定义一个`abandon`方法，`abandon`方法将决定这个即将被清理的模型是否清除。作为示例，`User`被删除时，我们将保留他已发布状态的`Post`关联数据。
 
 ```injectablephp
 <?php
@@ -103,7 +103,7 @@ class PostClear implements ClearsAttributes
      * @param Model $user
      * @return bool
      */
-    public function reserve(Model $post, Model $user): bool
+    public function abandon(Model $post, Model $user): bool
     {
         return $post->status === 'published';
     }

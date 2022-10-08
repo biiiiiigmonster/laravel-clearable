@@ -32,12 +32,13 @@ class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations()
     {
+        $this->migration->down();
         $this->migration->up();
     }
 
     protected function destroyDatabaseMigrations()
     {
-        $this->migration->down();
+//        $this->migration->down();
     }
 
     protected function defineDatabaseSeeders()
