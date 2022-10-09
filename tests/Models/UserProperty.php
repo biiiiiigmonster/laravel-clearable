@@ -18,7 +18,9 @@ class UserProperty extends Model
 
     protected $table = 'users';
 
-    protected $clears = ['posts'];
+    protected $clears = [
+        'posts', 'roles'
+    ];
 
     public function country(): BelongsTo
     {
@@ -47,7 +49,7 @@ class UserProperty extends Model
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class)->using(RoleUser::class)->withTimestamps();
+        return $this->belongsToMany(Role::class, RoleUser::class, 'user_id')->withTimestamps()->withPivot('type');
     }
 
     public function image(): MorphOne

@@ -1,5 +1,14 @@
 <?php
 
+use BiiiiiigMonster\Clearable\Jobs\ClearsJob;
+use BiiiiiigMonster\Clearable\Tests\Models\User;
+use Illuminate\Support\Facades\Queue;
+
 test('clear queue test', function () {
-    expect(true)->toBeTrue();
+    Queue::fake();
+
+    $user = User::has('posts', '>=', 2)->with('posts')->first();
+    $user->clear('posts')->setClearQueue('queue-name')->delete();
+
+    Queue::assertPushedOn('queue-name', ClearsJob::class);
 });

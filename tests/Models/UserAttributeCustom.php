@@ -5,6 +5,7 @@ namespace BiiiiiigMonster\Clearable\Tests\Models;
 use BiiiiiigMonster\Clearable\Attributes\Clear;
 use BiiiiiigMonster\Clearable\Concerns\HasClears;
 use BiiiiiigMonster\Clearable\Tests\Clears\PostVotesOddClear;
+use BiiiiiigMonster\Clearable\Tests\Clears\RoleExceptSystemTypeClear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -46,9 +47,10 @@ class UserAttributeCustom extends Model
         return $this->hasMany(Post::class, 'user_id');
     }
 
+    #[Clear(RoleExceptSystemTypeClear::class)]
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class)->using(RoleUser::class)->withTimestamps();
+        return $this->belongsToMany(Role::class, RoleUser::class, 'user_id')->withTimestamps()->withPivot('type');
     }
 
     public function image(): MorphOne

@@ -32,13 +32,12 @@ class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations()
     {
-        $this->migration->down();
         $this->migration->up();
     }
 
     protected function destroyDatabaseMigrations()
     {
-//        $this->migration->down();
+        $this->migration->down();
     }
 
     protected function defineDatabaseSeeders()
@@ -52,7 +51,7 @@ class TestCase extends Orchestra
             ->has(History::factory())
             ->has(Phone::factory())
             ->has(Image::factory(3))
-            ->hasAttached($roles->random(5))
+            ->hasAttached($roles->random(5), fn () => ['type' => \Faker\Factory::create()->numberBetween(1, 9)])
             ->sequence(fn () => ['country_id' => $countries->pluck('id')->random()])
             ->sequence(fn () => ['supplier_id' => $suppliers->pluck('id')->random()])
             ->create();
@@ -80,9 +79,9 @@ class TestCase extends Orchestra
 
         Schema::defaultStringLength(191);
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'BiiiiiigMonster\\Clearable\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'BiiiiiigMonster\\Clearable\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
 
-        $this->migration = include __DIR__.'/../database/migrations/create_clearable_test_table.php';
+        $this->migration = include __DIR__ . '/../database/migrations/create_clearable_test_table.php';
     }
 }

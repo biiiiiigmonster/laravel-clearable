@@ -4,6 +4,7 @@ namespace BiiiiiigMonster\Clearable\Tests\Models;
 
 use BiiiiiigMonster\Clearable\Concerns\HasClears;
 use BiiiiiigMonster\Clearable\Tests\Clears\PostVotesOddClear;
+use BiiiiiigMonster\Clearable\Tests\Clears\RoleExceptSystemTypeClear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +20,10 @@ class UserPropertyCustom extends Model
 
     protected $table = 'users';
 
-    protected $clears = ['posts' => PostVotesOddClear::class];
+    protected $clears = [
+        'posts' => PostVotesOddClear::class,
+        'roles' => RoleExceptSystemTypeClear::class,
+    ];
 
     public function country(): BelongsTo
     {
@@ -48,7 +52,7 @@ class UserPropertyCustom extends Model
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class)->using(RoleUser::class)->withTimestamps();
+        return $this->belongsToMany(Role::class, RoleUser::class, 'user_id')->withTimestamps()->withPivot('type');
     }
 
     public function image(): MorphOne

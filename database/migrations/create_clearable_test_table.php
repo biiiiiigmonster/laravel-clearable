@@ -51,6 +51,7 @@ return new class () extends Migration {
             $table->id();
             $table->bigInteger('user_id')->default(0);
             $table->bigInteger('role_id')->default(0);
+            $table->tinyInteger('type')->default(0);
             $table->timestamps();
         });
         Schema::create('suppliers', function (Blueprint $table) {

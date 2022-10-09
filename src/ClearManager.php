@@ -4,8 +4,9 @@ namespace BiiiiiigMonster\Clearable;
 
 use BiiiiiigMonster\Clearable\Attributes\Clear;
 use BiiiiiigMonster\Clearable\Jobs\ClearsJob;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -42,7 +43,7 @@ class ClearManager
         $clears = $this->parse();
 
         foreach ($clears as $relationName => $clear) {
-            $param = [$this->model::class, $relationName, $relations = EloquentCollection::wrap($this->model->$relationName), $clear->clearsAttributesClassName];
+            $param = [$this->model::class, $this->model->getOriginal(), $relationName, $relations = Collection::wrap($this->model->$relationName), $clear->clearsAttributesClassName];
             if ($relations->isNotEmpty()) {
                 $clear->clearQueue
                     ? ClearsJob::dispatch(...$param)->onQueue($clear->clearQueue)

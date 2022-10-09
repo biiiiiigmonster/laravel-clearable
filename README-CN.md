@@ -100,10 +100,9 @@ class PostClear implements ClearsAttributes
      * Decide if the clearable cleared.
      *
      * @param Model $post
-     * @param Model $user
      * @return bool
      */
-    public function abandon(Model $post, Model $user): bool
+    public function abandon(Model $post): bool
     {
         return $post->status === 'published';
     }
@@ -152,7 +151,7 @@ class User extends Model
      * 
      * @var string 
      */
-    protected $clearQueue = 'clearQueue';
+    protected $clearQueue = 'queue-name';
 }
 ```
 像这样定义完成后，posts关联的clear操作将放置到自定义的队列中去执行，减少了并行的压力。
@@ -195,7 +194,7 @@ class User extends Model
 ```
 同样的，你可以在`#[Clear]`中传入自定义清除，甚至单独配置`clearQueue`：
 ```injectablephp
-#[Clear(PostClear::class, 'clearQueue')]
+#[Clear(PostClear::class, 'queue-name')]
 public function posts()
 {
     return $this->hasMany(Post::class);
@@ -204,7 +203,7 @@ public function posts()
 Tips：`#[Clear]` Attribute 的配置优先级最高，会覆盖`protected $clears`中对应关联的配置
 
 ## 可清除关联类型
-数据的"删除"一般都是较为敏感的操作，我们不希望重要的数据被其他关联定义上clear，因此我们只支持在父子关联的子关联中实现"删除"。
+数据的"删除"一般都是较为敏感的操作，我们不希望重要的数据被其他关联定义上clear，因此我们只支持在父子关联的子关联中实现`清除`。
 
 支持列表：
 Illuminate\Database\Eloquent\Relations\HasOne;

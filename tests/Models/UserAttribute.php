@@ -45,9 +45,10 @@ class UserAttribute extends Model
         return $this->hasMany(Post::class, 'user_id');
     }
 
+    #[Clear]
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class)->using(RoleUser::class)->withTimestamps();
+        return $this->belongsToMany(Role::class, RoleUser::class, 'user_id')->withTimestamps()->withPivot('type');
     }
 
     public function image(): MorphOne

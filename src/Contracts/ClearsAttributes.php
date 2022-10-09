@@ -12,5 +12,5 @@ interface ClearsAttributes
      * @param Model $clear
      * @return bool
      */
-    public function abandon(Model $clear): bool;
+    public function abandon($clear): bool;
 }
