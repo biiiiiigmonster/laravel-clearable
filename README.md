@@ -184,7 +184,7 @@ class User extends Model
     /**
      * Get the posts for the user.
      *
-     * @return \HasMany
+     * @return HasMany
      */
     #[Clear] 
     public function posts()
@@ -193,7 +193,7 @@ class User extends Model
     }
 }
 ```
-同样的，你可以在`#[Clear]`中传入自定义清除，甚至单独配置`clearQueue`：
+Similarly, you can set `Custom Clear` in `#[Clear]`, or even configure `clearQueue` separately:
 ```injectablephp
 #[Clear(PostClear::class, 'queue-name')]
 public function posts()
@@ -201,25 +201,26 @@ public function posts()
     return $this->hasMany(Post::class);
 }
 ```
-> Tips：`#[Clear]`会覆盖`protected $clears`中对应关联的配置
+> Tips：`#[Clear]` will overwrite the corresponding configuration in `protected $clears`
 
-## 可清除关联类型
+## Clearable Relationship Type
 数据的"删除"一般都是较为敏感的操作，我们不希望重要的数据被其他关联定义上clear，因此我们只支持在父子关联的子关联中实现`清除`。
+Data's "deletion" is generally a sensitive operation, we do not want important data to declare `clear` by other relationships. Therefore, we don't support `clear` in the `BelongsTo` relationships.
 
-支持列表：
-- HasOne;
-- HasOneThrough;
-- HasMany;
-- HasManyThrough;
-- MorphMany;
-- MorphOne;
-- BelongsToMany;
-- MorphToMany;
-> Tips：`BelongsToMany`与`MorphToMany`关联定义clear时，删除的为中间表数据
+Support-List:
+- HasOne
+- HasOneThrough
+- HasMany
+- HasManyThrough
+- MorphMany
+- MorphOne
+- BelongsToMany
+- MorphToMany
+> Tips：When the `BelongsToMany` and `MorphToMany` relationship declare is `clear`, deleted is the pivot model data
 
-不支持列表：
-- BelongsTo;
-- MorphTo;
+Not-Support-List:
+- BelongsTo
+- MorphTo
 
 ## Test
 ```bash
