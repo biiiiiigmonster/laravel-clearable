@@ -11,11 +11,11 @@ class Clear
      * Clear constructor.
      *
      * @param string|null $clearsAttributesClassName
-     * @param string|null $clearQueue
+     * @param string|bool|null $clearQueue
      */
     public function __construct(
         public ?string $clearsAttributesClassName = null,
-        public ?string $clearQueue = null
+        public string|bool|null $clearQueue = null,
     ) {
     }
 }

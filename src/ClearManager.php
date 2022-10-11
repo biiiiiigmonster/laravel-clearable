@@ -50,8 +50,8 @@ class ClearManager
 
             if ($relations->isNotEmpty()) {
                 match ($clear->clearQueue) {
-                    null => ClearsJob::dispatchSync(...$payload),
-                    '' => ClearsJob::dispatch(...$payload),
+                    null,false => ClearsJob::dispatchSync(...$payload),
+                    true,'' => ClearsJob::dispatch(...$payload),
                     default => ClearsJob::dispatch(...$payload)->onQueue($clear->clearQueue)
                 };
             }
