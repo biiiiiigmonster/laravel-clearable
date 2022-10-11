@@ -76,26 +76,27 @@ class User extends Model
 ```
 Once the relationship has been added to the `clears` list, it will be auto-clear when deleted.
 
-## 清除配置
-### 自定义清除
-有时我们需要自定义清除的逻辑，可以通过定义一个实现`ClearsAttributes`接口的类来实现这一点。
+## Clear Configuration
+### Custom Clear
+Sometimes you may occasionally need to define your own clear's logic, You may accomplish this by defining a class that implements the `InvokableClear` interface.
 
-要生成新的清除对象，您可以使用 `make:clear` Artisan 命令。Clearable 会将新的清除对象放在`app/Clears`目录中。 如果此目录不存在，Clearable 将在您执行 Artisan 命令创建规则时创建它：
+To generate a new clear object, you may use the `make:clear` Artisan command. we will place the new rule in the `app/Clears` directory. If this directory does not exist, We will create it when you execute the Artisan command to create your clear:
 ```bash
-php artisan make:clear PostClear
+php artisan make:clear PostWithoutReleasedClear
 ```
 
-实现这个接口的类必须定义一个`abandon`方法，`abandon`方法将决定这个即将被清理的模型是否清除。作为示例，`User`被删除时，我们将保留他已发布状态的`Post`关联数据。
+Once the clear has been created, we are ready to define its behavior. A clear object contains a single method: `__invoke`.
+This method will determine whether the relation data is cleared.
 
 ```injectablephp
 <?php
 
 namespace App\Clears;
 
-use BiiiiiigMonster\Clears\Contracts\ClearsAttributes;
+use BiiiiiigMonster\Clears\Contracts\InvokableClear;
 use Illuminate\Database\Eloquent\Model;
 
-class PostClear implements ClearsAttributes
+class PostWithoutReleasedClear implements InvokableClear
 {
     /**
      * Decide if the clearable cleared.
@@ -103,9 +104,9 @@ class PostClear implements ClearsAttributes
      * @param Model $post
      * @return bool
      */
-    public function abandon(Model $post): bool
+    public function __invoke($post)
     {
-        return $post->status === 'published';
+        return $post->status != 'published';
     }
 }
 ```
@@ -204,8 +205,8 @@ public function posts()
 ```
 > Tips：`#[Clear]` will overwrite the corresponding configuration in `protected $clears`
 
-## Clearable Relationship Type
-Data's "deletion" is generally a sensitive operation, we do not want important data to declare `clear` by other relationships. Therefore, we don't support `clear` in the `BelongsTo` relationships.
+## Support Relationship
+Data's "deletion" is generally a sensitive operation, we do not want important data to declare `clear` by any relationships. Therefore, we don't support `clear` in the `BelongsTo` relationships.
 
 Support-List:
 - HasOne
@@ -222,7 +223,7 @@ Not-Support-List:
 - BelongsTo
 - MorphTo
 
-## Test
+# Test
 ```bash
 composer test
 ```

@@ -4,7 +4,7 @@ namespace BiiiiiigMonster\Clearable\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 
-interface ClearsAttributes
+interface InvokableClear
 {
     /**
      * Decide if the clearable cleared.
@@ -12,5 +12,5 @@ interface ClearsAttributes
      * @param Model $clear
      * @return bool
      */
-    public function abandon($clear): bool;
+    public function __invoke($clear): bool;
 }

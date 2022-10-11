@@ -45,7 +45,7 @@ class ClearManager
                 $this->model->getOriginal(),
                 $relationName,
                 $relations = Collection::wrap($this->model->$relationName),
-                $clear->clearsAttributesClassName
+                $clear->invokableClearClassName
             ];
 
             if ($relations->isNotEmpty()) {
@@ -68,13 +68,13 @@ class ClearManager
         $clears = [];
 
         // from clears array
-        foreach ($this->model->getClears() as $relationName => $clearsAttributesClassName) {
+        foreach ($this->model->getClears() as $relationName => $invokableClearClassName) {
             if (is_numeric($relationName)) {
-                $relationName = $clearsAttributesClassName;
-                $clearsAttributesClassName = null;
+                $relationName = $invokableClearClassName;
+                $invokableClearClassName = null;
             }
 
-            $clears[$relationName] = new Clear($clearsAttributesClassName, $this->model->getClearQueue());
+            $clears[$relationName] = new Clear($invokableClearClassName, $this->model->getClearQueue());
         }
 
         // from clear attribute

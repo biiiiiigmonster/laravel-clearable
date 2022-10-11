@@ -2,7 +2,7 @@
 
 namespace BiiiiiigMonster\Clearable;
 
-use BiiiiiigMonster\Clearable\Console\ClearsAttributesMakeCommand;
+use BiiiiiigMonster\Clearable\Console\InvokableClearMakeCommand;
 use Illuminate\Support\ServiceProvider;
 
 class ClearsServiceProvider extends ServiceProvider
@@ -14,6 +14,6 @@ class ClearsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->commands(ClearsAttributesMakeCommand::class);
+        $this->commands(InvokableClearMakeCommand::class);
     }
 }

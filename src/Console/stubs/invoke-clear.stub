@@ -2,10 +2,10 @@
 
 namespace {{ namespace }};
 
-use BiiiiiigMonster\Clearable\Contracts\ClearsAttributes;
+use BiiiiiigMonster\Clearable\Contracts\InvokableClear;
 use Illuminate\Database\Eloquent\Model;
 
-class {{ class }} implements ClearsAttributes
+class {{ class }} implements InvokableClear
 {
     /**
      * Decide if the clearable cleared.
@@ -13,7 +13,7 @@ class {{ class }} implements ClearsAttributes
      * @param Model $clear
      * @return bool
      */
-    public function abandon($clear): bool
+    public function __invoke($clear): bool
     {
         //
     }

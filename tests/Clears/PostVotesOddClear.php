@@ -2,11 +2,11 @@
 
 namespace BiiiiiigMonster\Clearable\Tests\Clears;
 
-use BiiiiiigMonster\Clearable\Contracts\ClearsAttributes;
+use BiiiiiigMonster\Clearable\Contracts\InvokableClear;
 
-class PostVotesOddClear implements ClearsAttributes
+class PostVotesOddClear implements InvokableClear
 {
-    public function abandon($clear): bool
+    public function __invoke($clear): bool
     {
         return $clear->votes % 2;
     }
