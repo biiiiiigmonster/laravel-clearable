@@ -4,7 +4,7 @@ use BiiiiiigMonster\Clearable\Jobs\ClearsJob;
 use BiiiiiigMonster\Clearable\Tests\Models\User;
 use Illuminate\Support\Facades\Queue;
 
-test('Clear default queue test', function () {
+test('Clear use queue test', function () {
     Queue::fake();
 
     $user = User::has('posts', '>=', 2)->with('posts')->first();
@@ -13,7 +13,7 @@ test('Clear default queue test', function () {
     Queue::assertPushed(ClearsJob::class);
 });
 
-test('Clear name queue test', function () {
+test('Clear named queue test', function () {
     Queue::fake();
 
     $user = User::has('posts', '>=', 2)->with('posts')->first();
