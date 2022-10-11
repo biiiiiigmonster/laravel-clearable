@@ -45,7 +45,7 @@ class User extends Model
     /**
      * Get the posts for the user.
      *
-     * @return \HasMany
+     * @return HasMany
      */
     public function posts()
     {
