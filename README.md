@@ -133,8 +133,9 @@ class User extends Model
 }
 ```
 
-### 队列执行
-When the associated data that we need to clear may be very large, it is a very good strategy to use `queue` to execute it.
+### Use Queue
+When the relation data that we need to clear may be very large, it is a very good strategy to use `queue` to execute it.
+
 Making it work is also simple, add the attribute name to the `clearQueue` property of your model.
 ```injectablephp
 namespace App\Models;
@@ -150,9 +151,9 @@ class User extends Model
     /**
      * The clearable that will be dispatch on this name queue.
      * 
-     * @var string 
+     * @var bool|string 
      */
-    protected $clearQueue = 'queue-name';
+    protected $clearQueue = true;
 }
 ```
 像这样定义完成后，posts关联的clear操作将放置到自定义的队列中去执行，减少了并行的压力。
@@ -204,7 +205,6 @@ public function posts()
 > Tips：`#[Clear]` will overwrite the corresponding configuration in `protected $clears`
 
 ## Clearable Relationship Type
-数据的"删除"一般都是较为敏感的操作，我们不希望重要的数据被其他关联定义上clear，因此我们只支持在父子关联的子关联中实现`清除`。
 Data's "deletion" is generally a sensitive operation, we do not want important data to declare `clear` by other relationships. Therefore, we don't support `clear` in the `BelongsTo` relationships.
 
 Support-List:
