@@ -77,7 +77,7 @@ trait HasClears
      * @param string|bool|null $clearQueue
      * @return $this
      */
-    public function setClearQueue(string|null $clearQueue): static
+    public function setClearQueue(string|bool|null $clearQueue): static
     {
         $this->clearQueue = $clearQueue;
 
