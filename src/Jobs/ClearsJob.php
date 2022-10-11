@@ -29,14 +29,14 @@ class ClearsJob implements ShouldQueue
      * @param array $original
      * @param string $relationName
      * @param Collection $collection
-     * @param string|null $clearsAttributesClassName
+     * @param string|null $invokableClearClassName
      */
     public function __construct(
         protected string $className,
         protected array $original,
         protected string $relationName,
         protected Collection $collection,
-        protected ?string $clearsAttributesClassName = null,
+        protected ?string $invokableClearClassName = null,
     ) {
     }
 
@@ -51,9 +51,11 @@ class ClearsJob implements ShouldQueue
         $relation = $model->{$this->relationName}();
 
         // to be cleared model.
-        $clears = $this->clearsAttributesClassName
-            ? $this->collection->filter(fn (Model $clear) => (new $this->clearsAttributesClassName())->abandon($clear, $model))
-            : $this->collection;
+        $clears = $this->collection;
+        if ($this->invokableClearClassName) {
+            $invoke = new $this->invokableClearClassName();
+            $clears = $clears->filter(fn (Model $clear) => $invoke($clear, $model));
+        }
 
         switch (true) {
             case $relation instanceof HasOneOrMany:

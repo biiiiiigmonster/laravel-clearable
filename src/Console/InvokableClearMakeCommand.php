@@ -4,7 +4,7 @@ namespace BiiiiiigMonster\Clearable\Console;
 
 use Illuminate\Console\GeneratorCommand;
 
-class ClearsAttributesMakeCommand extends GeneratorCommand
+class InvokableClearMakeCommand extends GeneratorCommand
 {
     /**
      * The console command name.
@@ -43,7 +43,7 @@ class ClearsAttributesMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $relativePath = '/stubs/clears-attributes.stub';
+        $relativePath = '/stubs/invoke-clear.stub';
 
         return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
             ? $customPath
