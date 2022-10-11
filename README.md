@@ -117,7 +117,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use BiiiiiigMonster\Clears\Concerns\HasClears;
-use App\Clears\PostClear;
+use App\Clears\PostWithoutReleasedClear;
 
 class User extends Model
 {
@@ -129,7 +129,7 @@ class User extends Model
      * @var array 
      */
     protected $clears = [
-        'posts' => PostClear::class
+        'posts' => PostWithoutReleasedClear::class
     ];
 }
 ```
@@ -143,7 +143,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use BiiiiiigMonster\Clears\Concerns\HasClears;
-use App\Clears\PostClear;
+use App\Clears\PostWithoutReleasedClear;
 
 class User extends Model
 {
@@ -157,21 +157,22 @@ class User extends Model
     protected $clearQueue = true;
 }
 ```
-像这样定义完成后，posts关联的clear操作将放置到自定义的队列中去执行，减少了并行的压力。
+Once the `clearQueue` has been declared, the `posts`'s clear behavior will be executed using the queue, reducing the serial pressure.
+> Tips: You can also set it as a string `protected $clearQueue = 'queue-name';`，which will run in the named queue
 
 ### Clearing At Runtime
 At runtime, you may instruct a model instance to using the `clear` or `setClears` method just like
 [`append`](https://laravel.com/docs/9.x/eloquent-serialization#appending-at-run-time):
 ```injectablephp
-$user->clear(['posts' => PostClear::class])->delete();
+$user->clear(['posts' => PostWithoutReleasedClear::class])->delete();
 
-$user->setClears(['posts' => PostClear::class])->delete();
+$user->setClears(['posts' => PostWithoutReleasedClear::class])->delete();
 ```
 
 ## PHP8 Attribute
-在php8中为我们引入了Attribute的特性，它提供了另外一种形式的配置，clear也已经为他做好了准备。
+The 'Attribute' feature is added to php8, which provides another form of configuration, and clear is ready for it.
 
-使用Attribute非常的简单，我们定义了一个`#[Clear]`的Attribute，你只需要在对应的关联方法中引入即可。
+It is very simple to use `Attribute`, we have defined an attribute of `#[Clear]`, just only need to relate the method.
 ```injectablephp
 namespace App\Models;
 
@@ -195,9 +196,10 @@ class User extends Model
     }
 }
 ```
+
 Similarly, you can set `Custom Clear` in `#[Clear]`, or even configure `clearQueue` separately:
 ```injectablephp
-#[Clear(PostClear::class, 'queue-name')]
+#[Clear(PostWithoutReleasedClear::class, 'queue-name')]
 public function posts()
 {
     return $this->hasMany(Post::class);
