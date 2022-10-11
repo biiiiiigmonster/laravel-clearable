@@ -157,7 +157,7 @@ class User extends Model
 }
 ```
 Once the `clearQueue` has been declared, the `posts`'s clear behavior will be executed using the queue, reducing the serial pressure.
-> Tips: You can also set it as a string `protected $clearQueue = 'queue-name';`，which will run in the named queue
+> Tips: You can also set it as a string `protected $clearQueue = 'queue-name';`, which will run in the named queue.
 
 ### Clearing At Runtime
 At runtime, you may instruct a model instance to using the `clear` or `setClears` method just like
@@ -204,7 +204,7 @@ public function posts()
     return $this->hasMany(Post::class);
 }
 ```
-> Tips：`#[Clear]` will overwrite the corresponding configuration in `protected $clears`
+> Tips：`#[Clear]` will overwrite the corresponding configuration in `protected $clears`.
 
 ## Support Relationship
 Data's "deletion" is generally a sensitive operation, we do not want important data to declare `clear` by any relationships. Therefore, we don't support `clear` in the `BelongsTo` relationships.
@@ -218,7 +218,7 @@ Support-List:
 - MorphOne
 - BelongsToMany
 - MorphToMany
-> Tips：When the `BelongsToMany` and `MorphToMany` relationship declare is `clear`, deleted is the pivot model data
+> Tips：When the `BelongsToMany` and `MorphToMany` relationship declare is `clear`, deleted is the pivot model data.
 
 Not-Support-List:
 - BelongsTo
