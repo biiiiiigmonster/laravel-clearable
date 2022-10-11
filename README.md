@@ -26,12 +26,11 @@ composer require biiiiiigmonster/laravel-clearable
 ```
 
 # Introductions
-`relationship` is powerful, it can help us maintain complex data relation.
+`relation` is powerful, it can help us manage complex relationship's data.
+Usually, as the last section of the data life cycle, the "delete" behavior receives less attention.
+We often neglect the processing of the associated model data while deleting the data itself, the business will also be damaged due to these residual data. 
 
-一般来说，“删除”操作作为数据生命周期的最后一节，受到的关注度较小，我们往往在删除数据本身的同时可能会疏忽掉与之关联的模型数据的处理，
-业务中数据完整的关联性也会因为这些残留数据而遭到破坏。
-
-这个包可以很方便的帮您管理这些关联数据删除关系，仅仅只需要简单的定义。让我们来尝试一下吧！
+This package can easily help you manage these related data's deletion relationships, with simple definitions. Let's try it!
 
 ## Usage
 For example, `User` model related `Post` model, it's also hoped that the associated `Post` model can be deleted after the `User` model deleted:
