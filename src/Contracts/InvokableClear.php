@@ -12,5 +12,5 @@ interface InvokableClear
      * @param Model $clear
      * @return bool
      */
-    public function __invoke($clear): bool;
+    public function __invoke($clear);
 }

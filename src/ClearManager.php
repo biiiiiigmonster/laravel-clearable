@@ -5,7 +5,6 @@ namespace BiiiiiigMonster\Clearable;
 use BiiiiiigMonster\Clearable\Attributes\Clear;
 use BiiiiiigMonster\Clearable\Jobs\ClearsJob;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -44,17 +43,14 @@ class ClearManager
                 $this->model::class,
                 $this->model->getOriginal(),
                 $relationName,
-                $relations = Collection::wrap($this->model->$relationName),
                 $clear->invokableClearClassName
             ];
 
-            if ($relations->isNotEmpty()) {
-                match ($clear->clearQueue) {
-                    null,false => ClearsJob::dispatchSync(...$payload),
-                    true,'' => ClearsJob::dispatch(...$payload),
-                    default => ClearsJob::dispatch(...$payload)->onQueue($clear->clearQueue)
-                };
-            }
+            match ($clear->clearQueue) {
+                null,false => ClearsJob::dispatchSync(...$payload),
+                true,'' => ClearsJob::dispatch(...$payload),
+                default => ClearsJob::dispatch(...$payload)->onQueue($clear->clearQueue)
+            };
         }
     }
 
