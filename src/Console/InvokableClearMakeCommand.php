@@ -43,7 +43,7 @@ class InvokableClearMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $relativePath = '/stubs/invoke-clear.stub';
+        $relativePath = '/stubs/invokable-clear.stub';
 
         return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
             ? $customPath
