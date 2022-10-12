@@ -22,13 +22,13 @@
     },
     "autoload": {
         "psr-4": {
-            "BiiiiiigMonster\\Clearable\\": "src",
-            "BiiiiiigMonster\\Clearable\\Database\\Factories\\": "database/factories"
+            "BiiiiiigMonster\\Clearable\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "BiiiiiigMonster\\Clearable\\Tests\\": "tests"
+            "BiiiiiigMonster\\Clearable\\Tests\\": "tests",
+            "BiiiiiigMonster\\Clearable\\Database\\Factories\\": "database/factories"
         }
     },
     "extra": {
