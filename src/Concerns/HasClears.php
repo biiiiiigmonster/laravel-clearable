@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property array $clears The relationships that will be auto-cleared when deleted.
  * @property string|bool|null $clearQueue The clearable that will be dispatch on this name queue.
- * @package BiiiiiigMonster\Clears\Concerns
  */
 trait HasClears
 {
