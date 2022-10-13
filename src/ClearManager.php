@@ -40,17 +40,14 @@ class ClearManager
 
         foreach ($clears as $relationName => $clear) {
             $payload = [
-                $this->model::class,
-                $this->model->getOriginal(),
+                $this->model->withoutRelations(),
                 $relationName,
-                $clear->invokableClearClassName
+                $clear
             ];
 
-            match ($clear->clearQueue) {
-                null,false => ClearsJob::dispatchSync(...$payload),
-                true,'' => ClearsJob::dispatch(...$payload),
-                default => ClearsJob::dispatch(...$payload)->onQueue($clear->clearQueue)
-            };
+            is_null($clear->clearQueue)
+                ? ClearsJob::dispatchSync(...$payload)
+                : ClearsJob::dispatch(...$payload);
         }
     }
 

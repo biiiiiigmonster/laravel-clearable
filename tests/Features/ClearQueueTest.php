@@ -8,7 +8,7 @@ test('Clear use queue test', function () {
     Queue::fake();
 
     $user = User::has('posts', '>=', 2)->with('posts')->first();
-    $user->clear('posts')->setClearQueue(true)->delete();
+    $user->clear('posts')->setClearQueue('')->delete();
 
     Queue::assertPushed(ClearsJob::class);
 });

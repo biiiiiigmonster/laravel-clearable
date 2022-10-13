@@ -2,6 +2,7 @@
 
 namespace BiiiiiigMonster\Clearable\Jobs;
 
+use BiiiiiigMonster\Clearable\Attributes\Clear;
 use BiiiiiigMonster\Clearable\Contracts\InvokableClear;
 use BiiiiiigMonster\Clearable\Exceptions\NotAllowedClearsException;
 use Illuminate\Bus\Queueable;
@@ -11,8 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use LogicException;
 
@@ -20,23 +19,21 @@ class ClearsJob implements ShouldQueue
 {
     use Dispatchable;
     use Queueable;
-    use SerializesModels;
-    use InteractsWithQueue;
 
     /**
      * ClearJob constructor.
      *
-     * @param string $className
-     * @param array $original
+     * @param Model $model
      * @param string $relationName
-     * @param string|null $invokableClearClassName
+     * @param Clear $clear
      */
     public function __construct(
-        protected string $className,
-        protected array $original,
+        protected Model $model,
         protected string $relationName,
-        protected ?string $invokableClearClassName = null,
+        protected Clear $clear,
     ) {
+        $this->onQueue($this->clear->clearQueue);
+        $this->onConnection($this->clear->clearConnection);
     }
 
     /**
@@ -46,13 +43,12 @@ class ClearsJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $model = (new $this->className())->setRawAttributes($this->original);
-        $relation = $model->{$this->relationName}();
+        $relation = $this->model->{$this->relationName}();
 
         // to be cleared model.
-        $clears = Collection::wrap($model->{$this->relationName});
-        if (is_a($this->invokableClearClassName, InvokableClear::class, true)) {
-            $invoke = new $this->invokableClearClassName();
+        $clears = Collection::wrap($this->model->{$this->relationName});
+        if (is_a($this->clear->invokableClearClassName, InvokableClear::class, true)) {
+            $invoke = new $this->clear->invokableClearClassName();
             $clears = $clears->filter(fn (Model $clear) => $invoke($clear));
         }
 
@@ -66,14 +62,14 @@ class ClearsJob implements ShouldQueue
             case $relation instanceof BelongsTo:
                 throw new NotAllowedClearsException(sprintf(
                     '%s::%s is relationship of %s, it not allowed to be cleared.',
-                    $this->className,
+                    $this->model::class,
                     $this->relationName,
                     $relation::class
                 ));
             default:
                 throw new LogicException(sprintf(
                     '%s::%s must return a relationship instance.',
-                    $this->className,
+                    $this->model::class,
                     $this->relationName
                 ));
         }
