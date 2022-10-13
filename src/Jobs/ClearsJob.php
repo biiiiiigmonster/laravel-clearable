@@ -2,7 +2,6 @@
 
 namespace BiiiiiigMonster\Clearable\Jobs;
 
-use BiiiiiigMonster\Clearable\Attributes\Clear;
 use BiiiiiigMonster\Clearable\Contracts\InvokableClear;
 use BiiiiiigMonster\Clearable\Exceptions\NotAllowedClearsException;
 use Illuminate\Bus\Queueable;
@@ -25,15 +24,13 @@ class ClearsJob implements ShouldQueue
      *
      * @param Model $model
      * @param string $relationName
-     * @param Clear $clear
+     * @param string|null $invokableClearClassName
      */
     public function __construct(
         protected Model $model,
         protected string $relationName,
-        protected Clear $clear,
+        protected ?string $invokableClearClassName,
     ) {
-        $this->onQueue($this->clear->clearQueue);
-        $this->onConnection($this->clear->clearConnection);
     }
 
     /**
@@ -47,8 +44,8 @@ class ClearsJob implements ShouldQueue
 
         // to be cleared model.
         $clears = Collection::wrap($this->model->{$this->relationName});
-        if (is_a($this->clear->invokableClearClassName, InvokableClear::class, true)) {
-            $invoke = new $this->clear->invokableClearClassName();
+        if (is_a($this->invokableClearClassName, InvokableClear::class, true)) {
+            $invoke = new $this->invokableClearClassName();
             $clears = $clears->filter(fn (Model $clear) => $invoke($clear));
         }
 

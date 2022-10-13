@@ -12,12 +12,12 @@ class Clear
      *
      * @param string|null $invokableClearClassName
      * @param string|null $clearQueue
-     * @param string|null $clearConnection
+     * @param string $clearConnection
      */
     public function __construct(
         public ?string $invokableClearClassName = null,
         public string|null $clearQueue = null,
-        public string|null $clearConnection = null,
+        public string $clearConnection = 'sync',
     ) {
     }
 }

@@ -36,19 +36,12 @@ class ClearManager
      */
     public function handle(): void
     {
-        $clears = $this->parse();
-
-        foreach ($clears as $relationName => $clear) {
-            $payload = [
-                $this->model->withoutRelations(),
-                $relationName,
-                $clear
-            ];
-
-            is_null($clear->clearQueue)
-                ? ClearsJob::dispatchSync(...$payload)
-                : ClearsJob::dispatch(...$payload);
-        }
+        collect($this->parse())->map(
+            fn (Clear $clear, string $relationName) =>
+                ClearsJob::dispatch($this->model->withoutRelations(), $relationName, $clear->invokableClearClassName)
+                    ->onConnection($clear->clearConnection)
+                    ->onQueue($clear->clearQueue)
+        );
     }
 
     /**
