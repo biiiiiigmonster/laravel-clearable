@@ -136,7 +136,7 @@ class User extends Model
 ### Use Queue
 When the relation data that we need to clear may be very large, it is a very good strategy to use `queue` to execute it.
 
-Making it work is also simple, add the attribute name to the `clearQueue` property of your model.
+Making it work is also simple, add the attribute name to the `clearConnection` property of your model.
 ```injectablephp
 namespace App\Models;
 
@@ -149,14 +149,14 @@ class User extends Model
     use HasClears;
     
     /**
-     * The clearable that will be dispatch on this name queue.
+     * The clearable that will be dispatch on this connection queue.
      * 
-     * @var bool|string 
+     * @var string|null 
      */
-    protected $clearQueue = true;
+    protected $clearConnection = 'redis';
 }
 ```
-Once the `clearQueue` has been declared, the `posts`'s clear behavior will be executed using the queue, reducing the serial pressure.
+Once the `clearConnection` has been declared, the `posts`'s clear behavior will be executed using the queue connection.
 > Tips: You can also set it as a string `protected $clearQueue = 'queue-name';`, which will run in the named queue.
 
 ### Clearing At Runtime
