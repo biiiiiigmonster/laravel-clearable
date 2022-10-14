@@ -10,6 +10,8 @@ use ReflectionMethod;
 
 class ClearManager
 {
+    public const SYNC_QUEUE_CONNECTION = 'sync';
+
     /**
      * ClearManager constructor.
      *
@@ -36,22 +38,12 @@ class ClearManager
      */
     public function handle(): void
     {
-        $clears = $this->parse();
-
-        foreach ($clears as $relationName => $clear) {
-            $payload = [
-                $this->model::class,
-                $this->model->getOriginal(),
-                $relationName,
-                $clear->invokableClearClassName
-            ];
-
-            match ($clear->clearQueue) {
-                null,false => ClearsJob::dispatchSync(...$payload),
-                true,'' => ClearsJob::dispatch(...$payload),
-                default => ClearsJob::dispatch(...$payload)->onQueue($clear->clearQueue)
-            };
-        }
+        collect($this->parse())->map(
+            fn (Clear $clear, string $relationName) =>
+                ClearsJob::dispatch($this->model->withoutRelations(), $relationName, $clear->invokableClearClassName)
+                    ->onConnection($clear->clearConnection)
+                    ->onQueue($clear->clearQueue)
+        );
     }
 
     /**
@@ -70,7 +62,7 @@ class ClearManager
                 $invokableClearClassName = null;
             }
 
-            $clears[$relationName] = new Clear($invokableClearClassName, $this->model->getClearQueue());
+            $clears[$relationName] = new Clear($invokableClearClassName, $this->model->getClearQueue(), $this->model->getClearConnection());
         }
 
         // from clear attribute

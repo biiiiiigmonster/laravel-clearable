@@ -3,6 +3,7 @@
 namespace BiiiiiigMonster\Clearable\Attributes;
 
 use Attribute;
+use BiiiiiigMonster\Clearable\ClearManager;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class Clear
@@ -11,11 +12,13 @@ class Clear
      * Clear constructor.
      *
      * @param string|null $invokableClearClassName
-     * @param string|bool|null $clearQueue
+     * @param string|null $clearQueue
+     * @param ?string $clearConnection
      */
     public function __construct(
         public ?string $invokableClearClassName = null,
-        public string|bool|null $clearQueue = null,
+        public ?string $clearQueue = null,
+        public ?string $clearConnection = ClearManager::SYNC_QUEUE_CONNECTION,
     ) {
     }
 }
