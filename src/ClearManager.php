@@ -10,6 +10,8 @@ use ReflectionMethod;
 
 class ClearManager
 {
+    public const SYNC_QUEUE_CONNECTION = 'sync';
+
     /**
      * ClearManager constructor.
      *
