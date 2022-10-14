@@ -60,7 +60,7 @@ class ClearManager
                 $invokableClearClassName = null;
             }
 
-            $clears[$relationName] = new Clear($invokableClearClassName, $this->model->getClearQueue());
+            $clears[$relationName] = new Clear($invokableClearClassName, $this->model->getClearQueue(), $this->model->getClearConnection());
         }
 
         // from clear attribute

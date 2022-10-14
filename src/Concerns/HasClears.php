@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property array $clears The relationships that will be auto-cleared when deleted.
  * @property ?string $clearQueue The clearable that will be dispatch on this name queue.
+ * @property ?string $clearConnection The clearable that will be dispatch on this name queue.
  */
 trait HasClears
 {
@@ -79,6 +80,29 @@ trait HasClears
     public function setClearQueue(?string $clearQueue): static
     {
         $this->clearQueue = $clearQueue;
+
+        return $this;
+    }
+
+    /**
+     * Get clearConnection.
+     *
+     * @return string|null
+     */
+    public function getClearConnection(): ?string
+    {
+        return $this->clearConnection;
+    }
+
+    /**
+     * Set the clearConnection attributes for the model.
+     *
+     * @param string $clearConnection
+     * @return $this
+     */
+    public function setClearConnection(string $clearConnection): static
+    {
+        $this->clearConnection = $clearConnection;
 
         return $this;
     }
