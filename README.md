@@ -157,7 +157,7 @@ class User extends Model
 }
 ```
 Once the `clearConnection` has been declared, the `posts`'s clear behavior will be executed using the queue connection.
-> Tips: You can also set it as a string `protected $clearQueue = 'queue-name';`, which will run in the named queue.
+> Tips: Even you can also set `protected $clearQueue` as a string, which will run in the named queue.
 
 ### Clearing At Runtime
 At runtime, you may instruct a model instance to using the `clear` or `setClears` method just like
